@@ -80,38 +80,6 @@ paid the same amount every time.
 Tap **Put away this month** on the dashboard to move money into savings — it comes out of your
 spendable pot and won't count toward next month either. **Take some out** reverses it.
 
-You can keep savings in more than one currency at once (say, some in rand, some in pounds) — each
-is tracked as its own separate pot. When you take money out of a foreign pot back into your
-day-to-day spending money, you get a choice: if you already converted it yourself (through your
-bank or Wise), type in exactly what you received; otherwise the app converts it for you at the
-stored exchange rate.
-
-## Working in a different currency
-
-If you're paid in a different currency every so often, you can set that one month's currency when
-you log the income that starts it (tick **Start this month from today** and a currency picker
-appears), or change it any time from **Settings → Month → This month's currency**. It only ever
-affects the month you're changing — anything already closed out stays exactly as it was, in
-whatever currency it was tracked in at the time, forever.
-
-If you're mostly paid in one particular currency and just want the app to run in that by default —
-say you're paid in pounds most months, not rand — set **Settings → Month → Default currency**
-once. Every new month then starts in that currency automatically, without you picking it each
-time; "This month's currency" above it still lets you override any one specific month. Like
-everything else here, changing your default never reaches back and reinterprets a month that's
-already begun.
-
-Logging a single entry in a currency other than your month's main one also works from the amount
-field itself — just pick the currency next to the amount, and it converts automatically using the
-rate shown (editable under Settings → Rules if your bank's actual rate differs).
-
-## Investments
-
-A separate area (tap **Investments** in the bottom bar) for tracking things like shares or crypto
-— completely separate from your day-to-day spending money, so it never affects your daily
-allowance. Add what you've put in and what it's worth now, or add a ticker/coin symbol and it'll
-fetch the live price for you.
-
 ## Finding past entries
 
 **Search** at the bottom searches everything you've ever logged — by category, note, amount, or

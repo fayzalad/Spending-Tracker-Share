@@ -4,7 +4,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Tracker">
 <meta name="theme-color" content="#EFEFF4">
-<meta name="slip-build" content="2026-09-12-5">
+<meta name="slip-build" content="2026-09-12-6">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
@@ -560,29 +560,14 @@
     </div>
     <div class="field">
       <input id="amt" type="number" inputmode="decimal" placeholder="Amount" aria-label="Amount">
-      <select id="cur" class="cursel" aria-label="Currency">
-        <option value="ZAR">R</option><option value="GBP">£</option>
-        <option value="USD">$</option><option value="GHS">₵</option>
-        <option value="EUR">€</option>
-      </select>
       <button class="go" id="addBtn">Add</button>
     </div>
-    <div class="conv" id="conv"></div>
     <div class="conv" id="dayPreview" aria-live="polite"></div>
     <div class="field" id="catRow"><select id="cat" aria-label="Category"></select></div>
     <div class="field"><input id="when" type="date" aria-label="Date"></div>
     <div class="field" id="cycRow" style="display:none"><select id="cyc" aria-label="Counts toward"></select></div>
     <label class="checkline" id="startRow" style="display:none">
       <input type="checkbox" id="startToday"><span id="startTodayLbl">Start this month from today</span></label>
-    <div class="field" id="cycCurRow" style="display:none">
-      <select id="cycCurSel" aria-label="This month's currency">
-        <option value="ZAR">R (ZAR)</option>
-        <option value="GBP">£ (GBP)</option>
-        <option value="USD">$ (USD)</option>
-        <option value="GHS">₵ (GHS)</option>
-        <option value="EUR">€ (EUR)</option>
-      </select>
-    </div>
     <div class="field">
       <input id="note" placeholder="Note (optional)" aria-label="Note">
     </div>
@@ -615,26 +600,6 @@
       <input id="sStart" type="date">
       <button class="ghost" id="resetStart" style="margin-top:8px">Back to the usual day</button>
       <p class="hint" id="startNow" style="margin:8px 0 0"></p></div>
-    <div class="sp"><label for="sCycCur">This month's currency</label>
-      <select id="sCycCur">
-        <option value="ZAR">R (ZAR)</option>
-        <option value="GBP">£ (GBP)</option>
-        <option value="USD">$ (USD)</option>
-        <option value="GHS">₵ (GHS)</option>
-        <option value="EUR">€ (EUR)</option>
-      </select>
-      <p class="hint" style="margin:8px 0 0">Only changes how this open month is shown — past
-        months keep whatever currency they were tracked in.</p></div>
-    <div class="sp"><label for="sHomeCur">Default currency</label>
-      <select id="sHomeCur">
-        <option value="ZAR">R (ZAR)</option>
-        <option value="GBP">£ (GBP)</option>
-        <option value="USD">$ (USD)</option>
-        <option value="GHS">₵ (GHS)</option>
-        <option value="EUR">€ (EUR)</option>
-      </select>
-      <p class="hint" style="margin:8px 0 0">What a new month starts in unless you pick something
-        else for it. Changing this never touches a month that's already begun.</p></div>
     <label>Recurring income</label>
     <p class="hint">Nudges you to log it once a new month starts, instead of retyping it from
       memory each time. Never logs it for you.</p>
@@ -649,15 +614,6 @@
       <div class="catlist" id="exList"></div></div>
     <div class="sp"><label>Counted as food</label>
       <div class="catlist" id="potList"></div></div>
-    <label>Rate to the rand</label>
-    <p class="hint" style="margin:0 0 8px">Mid-market rates, which is what Wise converts at before
-      its fee. Type over them with whatever your bank actually charged.</p>
-    <div class="rateline"><span>£ GBP</span><input id="rGBP" type="number" step="0.01" inputmode="decimal"></div>
-    <div class="rateline"><span>$ USD</span><input id="rUSD" type="number" step="0.01" inputmode="decimal"></div>
-    <div class="rateline"><span>₵ GHS</span><input id="rGHS" type="number" step="0.01" inputmode="decimal"></div>
-    <div class="rateline"><span>€ EUR</span><input id="rEUR" type="number" step="0.01" inputmode="decimal"></div>
-    <div class="sp"><button class="ghost" id="refreshRates">Fetch today's rates</button>
-      <p class="hint" id="ratesAge" style="margin:8px 0 0"></p></div>
   </section>
 
   <section data-pane="bills" hidden>
@@ -666,14 +622,6 @@
       from day one. A logged entry with the same category and a similar amount ticks one off.</p>
     <div class="catlist" id="billList"></div>
     <div class="sp"><button class="ghost" id="addBillBtn">Add an expected bill</button></div>
-    <label>Investments</label>
-    <p class="hint">Manage holdings from the Invest tab. This key just powers its price
-      updates.</p>
-    <div class="sp"><label for="avKey">Alpha Vantage API key</label>
-      <input id="avKey" type="password" placeholder="Free key, for stock/ETF prices" autocomplete="off">
-      <p class="hint" style="margin:8px 0 0">Needed to update stock and ETF prices — crypto works
-        without one. Free, no card: <a href="https://www.alphavantage.co/support/#api-key"
-        target="_blank" rel="noopener">alphavantage.co/support/#api-key</a>.</p></div>
     <label>Groups</label>
     <div class="catlist" id="grpList"></div>
     <div class="sp"><button class="ghost" id="addGrpBtn">Add a group</button></div>
@@ -729,20 +677,8 @@
 <dialog id="vaultDlg" tabindex="-1" autofocus>
   <h2 id="vaultTitle">Savings</h2>
   <p class="hint" id="vaultHint"></p>
-  <div class="sp" id="vaultPotRow" style="display:none"><label for="vaultCur" id="vaultCurLbl">Currency</label>
-    <select id="vaultCur">
-      <option value="ZAR">R (ZAR)</option>
-      <option value="GBP">£ (GBP)</option>
-      <option value="USD">$ (USD)</option>
-      <option value="GHS">₵ (GHS)</option>
-      <option value="EUR">€ (EUR)</option>
-    </select></div>
-  <div class="sp"><label for="vaultAmt" id="vaultAmtLbl">Amount (R)</label>
+  <div class="sp"><label for="vaultAmt">Amount (£)</label>
     <input id="vaultAmt" type="number" inputmode="decimal"></div>
-  <label class="checkline" id="vaultConvRow" style="display:none">
-    <input type="checkbox" id="vaultConverted"><span>Already converted this yourself?</span></label>
-  <div class="sp" id="vaultRecvRow" style="display:none"><label for="vaultRecv">Amount you actually received (R)</label>
-    <input id="vaultRecv" type="number" inputmode="decimal"></div>
   <div class="sp"><label for="vaultNote">What for</label>
     <input id="vaultNote" placeholder="Optional"></div>
   <button class="close" id="vaultSave">Confirm</button>
@@ -752,7 +688,7 @@
 <dialog id="payDlg" tabindex="-1" autofocus>
   <h2 id="payTitle">Log payment</h2>
   <p class="hint" id="payHint"></p>
-  <div class="sp"><label for="payAmt">Amount charged this month (R)</label>
+  <div class="sp"><label for="payAmt">Amount charged this month (£)</label>
     <input id="payAmt" type="number" inputmode="decimal"></div>
   <div class="sp" id="payLabelRow" style="display:none">
     <label for="payLabel">Which one is this</label>
@@ -771,7 +707,6 @@
   <button id="quickAdd" aria-label="Add"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg><span>Add</span></button>
   <button id="openFind" aria-label="Search"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><span>Search</span></button>
   <button id="openHist" aria-label="Months"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16" rx="2.5"/><path d="M3 9.5h18"/><path d="M8 2.5v4"/><path d="M16 2.5v4"/></svg><span>Months</span></button>
-  <button id="openInvest" aria-label="Investments"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16 9.5 10 14 13.5 20 6"/><path d="M14 6h6v6"/></svg><span>Invest</span></button>
   <button id="openSet" aria-label="Settings"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.03 1.56V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.55 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-1.56-1.03H3a2 2 0 1 1 0-4h.1A1.7 1.7 0 0 0 4.65 8.9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34H9a1.7 1.7 0 0 0 1-1.56V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1.03 1.56 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87V9a1.7 1.7 0 0 0 1.56 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></svg><span>Settings</span></button>
 </nav>
 
@@ -782,21 +717,6 @@
   <button class="ghost" id="subsAdd" style="margin-top:10px">Add a subscription or bill</button>
   <p class="hint" id="subsFoot" style="margin-top:12px"></p>
   <button class="close" id="closeSubs">Done</button>
-</dialog>
-
-<dialog id="investDlg" tabindex="-1" autofocus>
-  <h2>Investments</h2>
-  <p class="hint">Kept separate from your spending money — nothing here affects your allowance.</p>
-  <div class="savetop">
-    <div id="invOpen">
-      <span class="cap">Worth now</span><b class="num" id="invValue">R0</b>
-      <span class="sub" id="invSub">—</span></div>
-    <button class="ghost sm" id="invRefresh">Update prices</button>
-  </div>
-  <div id="invList"></div>
-  <p class="hint" id="invFoot" style="margin:12px 0 0"></p>
-  <button class="ghost" id="invAdd" style="margin-top:10px">Add a holding</button>
-  <button class="close" id="closeInvest">Done</button>
 </dialog>
 
 <dialog id="allDlg" tabindex="-1" autofocus>
@@ -868,54 +788,6 @@
   <button class="ghost" id="scanCancel" style="margin-top:8px">Cancel</button>
 </dialog>
 
-<dialog id="holdDlg">
-  <h2 id="holdTitle">Holding</h2>
-  <p class="hint">What you put in and what it is worth now. Kept completely separate from your
-    spending money — nothing here touches your allowance.</p>
-  <div class="sp"><label for="holdName">Name</label>
-    <input id="holdName" placeholder="Satrix MSCI World, Bitcoin, TFSA"></div>
-  <div class="two">
-    <div class="sp"><label for="holdKind">Kind</label>
-      <select id="holdKind">
-        <option value="etf">ETF / fund</option>
-        <option value="stock">Share</option>
-        <option value="crypto">Crypto</option>
-        <option value="cash">Cash / savings</option>
-        <option value="other">Other</option>
-      </select></div>
-    <div class="sp"><label for="holdCur">Currency</label>
-      <select id="holdCur">
-        <option value="ZAR">R (ZAR)</option>
-        <option value="USD">$ (USD)</option>
-        <option value="GBP">£ (GBP)</option>
-        <option value="GHS">₵ (GHS)</option>
-        <option value="EUR">€ (EUR)</option>
-      </select></div>
-  </div>
-  <div class="sp"><label for="holdSym">Ticker or coin id</label>
-    <input id="holdSym" placeholder="stxwdm.jo / bitcoin / AAPL"></div>
-  <div class="two">
-    <div class="sp"><label for="holdIn" id="holdInLabel">Money put in (R)</label>
-      <input id="holdIn" type="number" inputmode="decimal"></div>
-    <div class="sp"><label for="holdVal" id="holdValLabel">Worth now (R)</label>
-      <input id="holdVal" type="number" inputmode="decimal"></div>
-  </div>
-  <div class="two">
-    <div class="sp"><label for="holdUnits">Units held</label>
-      <input id="holdUnits" type="number" inputmode="decimal" placeholder="optional"></div>
-    <div class="sp"><label for="holdPrice" id="holdPriceLabel">Price each (R)</label>
-      <input id="holdPrice" type="number" inputmode="decimal" placeholder="optional"></div>
-  </div>
-  <p class="hint">The currency is just how it's shown here — put in and worth stay in whatever you
-    actually deal with (e.g. USD for a US brokerage). Nothing converts unless you tell it to.</p>
-  <p class="hint">Give units and a price and the value works itself out. A ticker or coin id also
-    lets Update prices fetch it. Otherwise just type what it is worth.</p>
-  <div class="sp"><label for="holdNote">Note</label><input id="holdNote" placeholder="Optional"></div>
-  <button class="close" id="holdSave">Save</button>
-  <button class="ghost" id="holdCancel" style="margin-top:8px">Cancel</button>
-  <button class="danger" id="holdDelete" style="display:none">Remove this holding</button>
-</dialog>
-
 <dialog id="billDlg">
   <h2>Expected bill</h2>
   <p class="hint">Roughly what it costs is fine — it only reserves the money.</p>
@@ -924,16 +796,7 @@
   <div class="sp"><label for="billAmt">Usual amount</label>
     <div class="field" style="margin:0">
       <input id="billAmt" type="number" inputmode="decimal">
-      <select id="billCur" class="cursel">
-        <option value="ZAR">R</option><option value="GBP">£</option>
-        <option value="USD">$</option><option value="GHS">₵</option>
-        <option value="EUR">€</option>
-      </select>
     </div></div>
-  <div class="sp" id="billZarRow" style="display:none">
-    <label for="billZar">What it actually costs you in rands</label>
-    <input id="billZar" type="number" inputmode="decimal" placeholder="Leave blank to convert at today's rate">
-    <p class="hint" id="billZarHint" style="margin:8px 0 0"></p></div>
   <div class="sp"><label for="billCat">Logged under</label>
     <select id="billCat"></select></div>
   <div class="two">
@@ -968,11 +831,6 @@
   <div class="sp"><label for="incAmt">Usual amount</label>
     <div class="field" style="margin:0">
       <input id="incAmt" type="number" inputmode="decimal">
-      <select id="incCur" class="cursel">
-        <option value="ZAR">R</option><option value="GBP">£</option>
-        <option value="USD">$</option><option value="GHS">₵</option>
-        <option value="EUR">€</option>
-      </select>
     </div></div>
   <div class="two">
     <div class="sp"><label for="incEvery">How often</label>
@@ -1017,7 +875,7 @@
 <dialog id="moveDlg" tabindex="-1" autofocus>
   <h2>Edit entry</h2>
   <p class="hint" id="moveWhat"></p>
-  <div class="sp"><label for="moveAmt">Amount (R)</label>
+  <div class="sp"><label for="moveAmt">Amount (£)</label>
     <input id="moveAmt" type="number" inputmode="decimal"></div>
   <div class="sp" id="moveCatRow"><label for="moveCat">Category</label>
     <select id="moveCat"></select></div>
@@ -1045,34 +903,26 @@
       localStorage.removeItem(k)}catch(e){}}
   };
 
-  const SYM={ZAR:'R',GBP:'\u00a3',USD:'$',GHS:'\u20b5',EUR:'\u20ac'};
-  let data={day:25,goal:0,theme:'auto',
-    rates:{ZAR:1,GBP:21.78,USD:15.96,GHS:1.44,EUR:18.75},ratesAt:'2026-08-25',
-    glass:false, holdings:[], invAt:null, invHist:[],
+  const SYM={GBP:'\u00a3'};
+  let data={day:1,goal:0,theme:'auto',
+    rates:{GBP:1},ratesAt:'2026-08-25',
+    glass:false,
     lastBackup:null,gistId:null,tok:'',rev:0,syncedRev:0,starts:{},cats:[],groups:[],
-    bills:[],ticks:{},potCats:[],exclude:[],deleted:{},entries:[],incomes:[],avKey:'',
-    homeCur:'ZAR',cycCur:{},cycRate:{}};
+    bills:[],ticks:{},potCats:[],exclude:[],deleted:{},entries:[],incomes:[],
+    homeCur:'GBP',cycCur:{},cycRate:{}};
   let syncTimer=null, bannerOff=false, billBannerOff=false, incBannerOff=false;
   let scope='week', kind='out';
   let lastCalc=null;   // most recent calc() from render(), reused so typing an amount doesn't force a fresh full recompute
 
   const $=id=>document.getElementById(id);
-  const fmtMoney=(n,cur)=>{cur=cur||'ZAR';
-    const neg=n<0, v=Math.round(Math.abs(n)).toLocaleString('en-ZA');
-    return cur==='ZAR'?(neg?'−R':'R')+v:(neg?'−':'')+SYM[cur]+v};
-  // a cycle's currency is a display choice only — the ledger itself always stays in rand.
-  // the rate used to convert it is the one frozen at data.cycRate[cyc] the moment that
-  // cycle's currency was chosen, never the live table, so a closed month never drifts
-  // when the rate table is edited later
-  const curForCyc=cyc=>(data.cycCur&&data.cycCur[cyc])||data.homeCur||'ZAR';
+  const fmtMoney=(n,cur)=>{cur=cur||'GBP';
+    const neg=n<0, v=Math.round(Math.abs(n)).toLocaleString('en-GB');
+    return (neg?'−':'')+SYM[cur]+v};
+  const curForCyc=cyc=>(data.cycCur&&data.cycCur[cyc])||data.homeCur||'GBP';
   const rateForCyc=cyc=>(data.cycRate&&data.cycRate[cyc])||1;
-  // freezes a cycle's currency+rate the moment it first gets an entry, so it's pinned to
-  // whatever the default was back then — otherwise a cycle that never got an explicit
-  // currency choice would keep reading data.homeCur live, and changing your default currency
-  // later would silently reinterpret every past month that just went with the default
   const ensureCycCur=cyc=>{
     if(data.cycCur[cyc]===undefined){
-      const cur=data.homeCur||'ZAR';
+      const cur=data.homeCur||'GBP';
       data.cycCur[cyc]=cur; data.cycRate[cyc]=data.rates[cur]||1;
     }
   };
@@ -1114,21 +964,21 @@
     save();fillSet();setKind(kind);
   }
   const cycEnd=cs=>addDays(cycNext(cs),-1);
-  const cycName=cs=>D(cycEnd(cs)).toLocaleDateString('en-ZA',{month:'long'});
-  const cycRange=cs=>D(cs).toLocaleDateString('en-ZA',{day:'numeric',month:'short'})+' – '+
-    D(cycEnd(cs)).toLocaleDateString('en-ZA',{day:'numeric',month:'short'});
+  const cycName=cs=>D(cycEnd(cs)).toLocaleDateString('en-GB',{month:'long'});
+  const cycRange=cs=>D(cs).toLocaleDateString('en-GB',{day:'numeric',month:'short'})+' – '+
+    D(cycEnd(cs)).toLocaleDateString('en-GB',{day:'numeric',month:'short'});
   const cycLabel=cs=>cycName(cs)+' · '+
-    D(cs).toLocaleDateString('en-ZA',{day:'numeric',month:'short'})+' – '+
-    D(cycEnd(cs)).toLocaleDateString('en-ZA',{day:'numeric',month:'short'});
+    D(cs).toLocaleDateString('en-GB',{day:'numeric',month:'short'})+' – '+
+    D(cycEnd(cs)).toLocaleDateString('en-GB',{day:'numeric',month:'short'});
 
   const BILLS=['Rent','Electricity','Water / levies','Internet','Subscriptions','Phone / data'];
-  const LIVING=['Uber Eats','Mr D','Take out','Bella Mare Cafe','Eating out',
+  const LIVING=['Uber Eats','Take out','Eating out',
                 'Groceries','Transport','Health','Other'];
-  const SHOP=['Takealot','Amazon','Shein','Temu','Games','Tech / gadgets','Clothes'];
+  const SHOP=['Amazon','Shein','Temu','Games','Tech / gadgets','Clothes'];
   const ICON={'Rent':'🏠','Electricity':'⚡','Water / levies':'💧','Internet':'🛜','Subscriptions':'🔁',
     'Phone / data':'📶','Uber Eats':'🛵','Groceries':'🛒','Eating out':'🍽','Transport':'🚌',
-    'Health':'⚕','Other':'•','Money in':'↓','Takealot':'📦','Amazon':'📦','Shein':'👗','Temu':'🛍',
-    'Mr D':'🛵','Take out':'🥡','Bella Mare Cafe':'☕','Savings':'🔒',
+    'Health':'⚕','Other':'•','Money in':'↓','Amazon':'📦','Shein':'👗','Temu':'🛍',
+    'Take out':'🥡','Savings':'🔒',
     'Games':'🎮','Tech / gadgets':'🔌','Clothes':'👕'};
   const customs=()=>data.cats||[];
   const custom=n=>customs().find(c=>c.n===n);
@@ -1156,21 +1006,8 @@
   const exCats=()=>(data.exclude&&data.exclude.length)?data.exclude:EXDEF;
   const isBill=e=>isSpend(e)&&exCats().indexOf(e.cat)>-1;
   const isLiving=e=>isSpend(e)&&!isBill(e);
-  // a savings pot is tracked in whatever currency it was actually put away in — separate
-  // from the month's own currency. potAmt reads the native pot-currency amount (orig for a
-  // foreign-currency move, amt for a plain rand one); savingsTotals groups the running
-  // balance per pot, the way investCur groups holdings by currency
-  const potAmt=e=>e.cur?e.orig:e.amt;
-  const savingsTotals=()=>{
-    const t={};
-    data.entries.forEach(e=>{
-      if(!isSave(e)&&!isUnsave(e))return;
-      const c=e.cur||'ZAR';
-      t[c]=(t[c]||0)+(isSave(e)?potAmt(e):-potAmt(e));
-    });
-    return t;
-  };
-  const potCurs=()=>Object.keys(savingsTotals()).filter(c=>savingsTotals()[c]>0.01);
+  const savingsTotal=()=>data.entries.reduce(
+    (s,e)=>s+(isSave(e)?e.amt:isUnsave(e)?-e.amt:0),0);
 
   const inCyc=cs=>data.entries.filter(e=>(e.cyc||cycStart(e.date))===cs);
   const sum=(a,f)=>a.filter(f).reduce((s,e)=>s+e.amt,0);
@@ -1181,17 +1018,8 @@
   // a yearly bill is only expected in the month it is actually charged
   const dueIn=(b,cs)=>(b.every!=='year')||(D(cycEnd(cs)).getMonth()+1===Number(b.month||1));
   const dueBills=cs=>expected().filter(b=>dueIn(b,cs));
-  // what a bill costs in rands: your own figure if you gave one, else today's rate
-  // the rand figure is fixed when you save the bill and never moves again on its own,
-  // whether you typed it or it was converted for you
-  const billZar=b=>{
-    if(b.zar>0)return b.zar;
-    if(b.cur&&b.cur!=='ZAR')return b.a*(Number(b.rate)||Number(data.rates[b.cur])||1);
-    return b.a;
-  };
-  const billLabel=b=>b.cur&&b.cur!=='ZAR'
-    ? SYM[b.cur]+b.a+' · '+R(billZar(b))+(b.zarManual?'':' at R'+(b.rate||'?'))
-    : R(billZar(b));
+  const billZar=b=>b.a;
+  const billLabel=b=>R(billZar(b));
   // one payment can only settle one bill — otherwise a single R210 ticks off
   // both iCloud and Netflix. Best matches claim their entry first.
   function billAssign(cs){
@@ -1230,10 +1058,8 @@
     .reduce((s,b)=>s+billZar(b)/12,0);
   const reserveFor=cs=>unpaid(cs).reduce((s,b)=>s+billZar(b),0)+smoothed(cs);
 
-  // recurring income: a nudge only, never auto-logged, never reserved — so unlike bills
-  // it doesn't need a locked-at-save-time rand figure, just today's rate
   const expectedIncomes=()=>data.incomes||[];
-  const incZar=inc=>inc.cur&&inc.cur!=='ZAR'?inc.a*(Number(data.rates[inc.cur])||1):inc.a;
+  const incZar=inc=>inc.a;
   const incDueIn=(inc,cs)=>(inc.every!=='year')||(D(cycEnd(cs)).getMonth()+1===Number(inc.month||1));
   // ponytail: matched on amount alone, not category — income entries don't carry one.
   // fine with one recurring income; a second in the same range could double-match.
@@ -1289,7 +1115,7 @@
     // food: what it costs this month, and when the last order was
     const elapsed=diff(cs,t)+1;
     const POTCATS=data.potCats&&data.potCats.length?data.potCats
-      :['Uber Eats','Mr D','Take out','Bella Mare Cafe','Eating out'];
+      :['Uber Eats','Take out','Eating out'];
     const isFood=e=>isSpend(e)&&POTCATS.indexOf(e.cat)>-1;
     const eats=sum(es,isFood);
     const foodShare=cLive>0?eats/cLive:0;
@@ -1351,17 +1177,15 @@
     $('billVal').textContent=R(isW?c.wBill:c.cBill);
     $('outVal').textContent=R(isW?c.wLive:c.cLive);
 
-    // savings \u2014 each pot keeps its own currency, so the running total is shown per pot
-    // rather than blended into one (mis)leading rand figure once more than one is in use
-    const potTotals=savingsTotals();
-    const potList=Object.keys(potTotals).filter(k=>Math.abs(potTotals[k])>0.01);
+    // savings
+    const vault=savingsTotal();
     $('vault').textContent=R(Math.max(0,c.cSaved));
-    $('vaultAll').textContent=potList.length?potList.map(k=>RC(potTotals[k],k)).join(' \u00b7 '):R(0);
+    $('vaultAll').textContent=R(vault);
     $('vaultSub').textContent=data.goal>0
       ? (c.goalLeft>0?R(c.goalLeft)+' of your '+R(data.goal)+' goal still held back from your daily rate'
                      :'this month\u2019s '+R(data.goal)+' goal is done')
       : (c.cSaved>0?'moved across this month':'nothing put away this month');
-    $('withdrawBtn').style.display=potList.length?'block':'none';
+    $('withdrawBtn').style.display=vault>0?'block':'none';
     const sweeps=unsweptMonths();
     const sb=$('sweepBox'); sb.innerHTML='';
     // the goal is only protected until you actually move it — offer to do that now
@@ -1398,7 +1222,7 @@
       b.onclick=()=>openVault('save',Math.round(left*100)/100,cycName(cs)+' leftover',cs);
       row.appendChild(b); sb.appendChild(row);
     });
-    if(!sweeps.length&&!potList.length){
+    if(!sweeps.length&&vault===0){
       const row=document.createElement('div'); row.className='sweep';
       row.innerHTML='<span>Whatever is left when a month ends can be moved here, '+
         'so it stops counting as money to spend.</span>';
@@ -1445,12 +1269,12 @@
     }else{
       const outDate=addDays(c.t,Math.max(0,c.runDays));
       const safeTill=c.runDays>=c.daysLeft-1;
-      $('run').textContent=D(outDate).toLocaleDateString('en-ZA',{day:'numeric',month:'short'});
+      $('run').textContent=D(outDate).toLocaleDateString('en-GB',{day:'numeric',month:'short'});
       $('run').className='num '+(safeTill?'good':'bad');
       const win=c.paceWin===1?'today':'the last '+c.paceWin+' days';
       $('runSub').textContent='if you keep spending '+R(c.pace)+' a day, as you have over '+win+
         (safeTill?' — that lasts past month end'
-                 :' — month ends '+D(c.ce).toLocaleDateString('en-ZA',{day:'numeric',month:'short'}));
+                 :' — month ends '+D(c.ce).toLocaleDateString('en-GB',{day:'numeric',month:'short'}));
     }
 
     $('safe').textContent=R(c.todayLeft);
@@ -1542,8 +1366,8 @@
     const fixedPer=[];
     for(let i=0;i<span;i++){const d=addDays(start,i);
       fixedPer.push(d>c.t?0:sum(data.entries,e=>isLiving(e)&&isFixedCat(e.cat)&&e.date===d))}
-    const short=v=>v>=1000?'R'+(v/1000).toFixed(v>=10000?0:1).replace('.0','')+'k'
-                          :'R'+Math.round(v);
+    const short=v=>v>=1000?'£'+(v/1000).toFixed(v>=10000?0:1).replace('.0','')+'k'
+                          :'£'+Math.round(v);
     // week: label every day that has spending. month: only the biggest few, or it turns to mush
     const top3=per.map((v,i)=>[i,v]).filter(x=>x[1]>0)
       .sort((a,b)=>b[1]-a[1]).slice(0,3).map(x=>x[0]);
@@ -1577,7 +1401,7 @@
       if(fx>0&&v>0){
         const seg=document.createElement('i'); seg.className='fix';
         seg.style.height=Math.min(100,fx/v*100)+'%';
-        seg.title='R'+Math.round(fx)+' of this was a bill';
+        seg.title='£'+Math.round(fx)+' of this was a bill';
         b.appendChild(seg);
       }
       if(v>0&&labelDay(i,v)){
@@ -1587,7 +1411,7 @@
         b.appendChild(lab);
       }
       const d=addDays(start,i);
-      b.title=D(d).toLocaleDateString('en-ZA',{day:'numeric',month:'short'})+' · '+R(v)+
+      b.title=D(d).toLocaleDateString('en-GB',{day:'numeric',month:'short'})+' · '+R(v)+
         (hot?' · over your daily allowance':'');
       col.appendChild(b);bars.appendChild(col);
       if(isW){const s=document.createElement('span');s.textContent=names[i];
@@ -1739,7 +1563,7 @@
       '<span class="n"><s>'+(isIn(e)?(e.note||'Money in')
         :isSave(e)?'Moved to savings':isUnsave(e)?'Taken from savings':e.cat)+'</s>'+
       (function(){const bits=[];
-        if(e.cur)bits.push(SYM[e.cur]+e.orig.toLocaleString('en-ZA')+' at R'+e.rate);
+        if(e.cur)bits.push(SYM[e.cur]+e.orig.toLocaleString('en-GB')+' at £'+e.rate);
         if(!isIn(e)&&e.note)bits.push(e.note);
         return bits.length?'<em>'+bits.join(' \u00b7 ')+'</em>':''})()+'</span>'+
       '<span class="a num">'+(credit?'+'+Rcyc(Math.abs(e.amt),ecyc):Rcyc(-e.amt,ecyc))+'</span>';
@@ -1774,7 +1598,7 @@
       const h=document.createElement('div');h.className='dayhead';
       const dcyc=cycStart(d);
       h.innerHTML='<span class="n">'+(d===todayIso?'Today':
-        D(d).toLocaleDateString('en-ZA',{weekday:'long',day:'numeric',month:'short'}))+
+        D(d).toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'short'}))+
         '</span><span class="t num">'+(inMode?'+'+Rcyc(net,dcyc):Rcyc(net,dcyc))+'</span>';
       box.appendChild(h);
       const ul=document.createElement('ul');
@@ -1791,7 +1615,7 @@
     const base=e.cyc||cycStart(e.date);
     $('moveWhat').textContent=(isIn(e)?(e.note||'Money in')
       :isSave(e)?'Moved to savings':isUnsave(e)?'Taken from savings':e.cat)+' · '+Rcyc(e.amt,base)+
-      ' · logged '+D(e.date).toLocaleDateString('en-ZA',{day:'numeric',month:'short'});
+      ' · logged '+D(e.date).toLocaleDateString('en-GB',{day:'numeric',month:'short'});
     let opts='', c=base;
     for(let i=0;i<2;i++)c=addDays(cycStart(addDays(c,-1)),0);
     for(let i=0;i<5;i++){
@@ -1850,21 +1674,15 @@
     btn.disabled=true; btn.style.opacity='.5';
     setTimeout(()=>{btn.disabled=false;btn.style.opacity=''},700);
     const when=$('when').value||today();
-    let newCycCur=false;
-    if(type==='in'&&$('startToday').checked){setAnchor(when);cyc=cycStart(when);
-      const cc=$('cycCurSel').value;
-      data.cycCur[cyc]=cc; data.cycRate[cyc]=data.rates[cc]||1; newCycCur=true}
-    const cur=$('cur').value, rate=Number(data.rates[cur])||1;
+    if(type==='in'&&$('startToday').checked){setAnchor(when);cyc=cycStart(when)}
     const id=Date.now()+Math.random();
     const refund=(type==='refund');
-    const e={id,amt:(refund?-1:1)*amt*rate,cat,note:(note||'').trim(),date:when,
+    const e={id,amt:(refund?-1:1)*amt,cat,note:(note||'').trim(),date:when,
              type:refund?'out':(type||'out'),refund:refund||undefined,
              cyc:cyc||cycStart(when)};
-    if(cur!=='ZAR'){e.cur=cur;e.orig=amt;e.rate=rate}
     ensureCycCur(e.cyc);
     data.entries.push(e);
     $('amt').value='';$('note').value='';$('when').value=today();save();
-    if(newCycCur)fillSet();
   }
 
   function setKind(k){
@@ -1878,9 +1696,8 @@
     if(k==='in'){$('startToday').checked=false;
       const wd=$('when').value||today();
       $('startTodayLbl').textContent='Start the month from '+
-        D(wd).toLocaleDateString('en-ZA',{day:'numeric',month:'short'})+' instead of the '+
+        D(wd).toLocaleDateString('en-GB',{day:'numeric',month:'short'})+' instead of the '+
         data.day+'th';}
-    $('cycCurRow').style.display='none';
     $('addBtn').textContent=k==='in'?'Add money':k==='refund'?'Add refund':'Add';
     $('addBtn').className='go'+(k==='in'?' in':'');
     $('amt').placeholder=k==='in'?'Amount received'
@@ -1906,19 +1723,18 @@
   }
 
   function csv(cs){
-    const rows=[['Date','Month','In/Out','Category','Note','Currency','Original','Rate','Amount (ZAR)']];
+    const rows=[['Date','Month','In/Out','Category','Note','Amount (GBP)']];
     const es=(cs?inCyc(cs):data.entries.slice()).sort((a,b)=>a.date<b.date?-1:1);
     es.forEach(e=>rows.push([e.date,(e.cyc||cycStart(e.date)),
       isIn(e)?'In':isSave(e)?'To savings':isUnsave(e)?'From savings':(isBill(e)?'Bill':'Living'),
       isIn(e)?'Money in':isSave(e)?'To savings':isUnsave(e)?'From savings':e.cat,
-      e.note||'',e.cur||'ZAR',
-      e.cur?e.orig:e.amt,e.cur?e.rate:1,Math.round(e.amt*100)/100]));
+      e.note||'',Math.round(e.amt*100)/100]));
     const i=sum(es,isIn), b=sum(es,isBill),
           l=sum(es,isLiving);
-    rows.push([],['','','','','','','','Received',Math.round(i*100)/100]);
-    rows.push(['','','','','','','','Bills',Math.round(b*100)/100]);
-    rows.push(['','','','','','','','Living',Math.round(l*100)/100]);
-    rows.push(['','','','','','','','Left over',Math.round((i-b-l)*100)/100]);
+    rows.push([],['','','','Received',Math.round(i*100)/100]);
+    rows.push(['','','','Bills',Math.round(b*100)/100]);
+    rows.push(['','','','Living',Math.round(l*100)/100]);
+    rows.push(['','','','Left over',Math.round((i-b-l)*100)/100]);
     dl('tracker-'+(cs?cs:'all')+'.csv',rows.map(r=>r.map(esc).join(',')).join('\n'));
   }
 
@@ -2010,9 +1826,9 @@
 
     const ACCENT=[.357,.239,.961], INK=[.07,.08,.10], MUTE=[.45,.47,.52],
           RULE=[.85,.86,.90], TINT=[.965,.962,.99], GREEN=[0,.53,.36], RED=[.78,.18,.20];
-    // the entry list is for reconciling against a bank statement, so it keeps cents —
-    // matching csv(), unlike R() which rounds to whole rand everywhere else in the app
-    const Rc=n=>'R '+Math.abs(n).toLocaleString('en-ZA',{minimumFractionDigits:2,maximumFractionDigits:2});
+    // the entry list is for reconciling against a bank statement, so it keeps pence —
+    // matching csv(), unlike R() which rounds to whole pounds everywhere else in the app
+    const Rc=n=>'£ '+Math.abs(n).toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2});
     const L=48, RGT=547, W=RGT-L, TOP=742, BOT=72;
     const pages=[]; let items=[], y=TOP;
     const push=o=>items.push(o);
@@ -2035,7 +1851,7 @@
     push({t:'Tracker',x:L,y:812,size:11,bold:true,fill:[1,1,1]});
     push({t:cycName(cs),x:L,y:784,size:22,bold:true,fill:[1,1,1]});
     push({t:cycRange(cs),x:RGT,y:812,size:9,right:true,fill:[1,1,1]});
-    push({t:'generated '+D(today()).toLocaleDateString('en-ZA',
+    push({t:'generated '+D(today()).toLocaleDateString('en-GB',
       {day:'numeric',month:'long',year:'numeric'}),x:RGT,y:784,size:9,right:true,fill:[1,1,1]});
 
     // the four figures, in boxes across the page
@@ -2088,11 +1904,11 @@
     es.forEach((e,n)=>{
       if(n%2===0)band(15);
       const credit=isIn(e)||isUnsave(e)||e.amt<0;
-      txt(D(e.date).toLocaleDateString('en-ZA',{day:'2-digit',month:'short'}),L+8,
+      txt(D(e.date).toLocaleDateString('en-GB',{day:'2-digit',month:'short'}),L+8,
         {size:8.5,fill:MUTE});
       txt(isIn(e)?'Money in':isSave(e)?'To savings':isUnsave(e)?'From savings':e.cat,
         L+62,{size:9});
-      const detail=[e.cur?SYM[e.cur]+e.orig+' at R'+e.rate:'',e.note||'']
+      const detail=[e.cur?SYM[e.cur]+e.orig+' at £'+e.rate:'',e.note||'']
         .filter(Boolean).join(' - ').slice(0,38);
       if(detail)txt(detail,L+205,{size:8.5,fill:MUTE});
       rt((credit?'+':'-')+Rc(e.amt),
@@ -2115,9 +1931,7 @@
         pg.push({t:'Amount',x:RGT,y:763,size:7.5,bold:true,right:true,fill:MUTE});
       }
       pg.push({rule:[L,58,RGT,58],stroke:RULE});
-      pg.push({t:(curForCyc(cs)==='ZAR'?'Summary figures and the entry list below are both in '
-          :'Summary figures are in '+curForCyc(cs)+'; the entry list below stays in ')+
-        'South African rand. Foreign entries show the original and the rate used that day.',
+      pg.push({t:'All amounts in pounds sterling.',
         x:L,y:44,size:7.5,fill:MUTE});
       pg.push({t:'Page '+(n+1)+' of '+pages.length,x:RGT,y:44,size:7.5,right:true,fill:MUTE});
     });
@@ -2137,7 +1951,7 @@
     const hay=[e.cat,e.note||'',String(Math.round(e.amt)),
       e.cur?e.cur+' '+e.orig:'', isIn(e)?'money in received':'',
       isSave(e)||isUnsave(e)?'savings':'',
-      D(e.date).toLocaleDateString('en-ZA',{day:'numeric',month:'long',year:'numeric'}),
+      D(e.date).toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'}),
       cycName(cyc)].join(' ').toLowerCase();
     return hay.indexOf(q)>-1;
   }
@@ -2161,7 +1975,7 @@
       if(e.date!==lastDate){
         lastDate=e.date;
         const h=document.createElement('div'); h.className='dayhead';
-        h.innerHTML='<span class="n">'+D(e.date).toLocaleDateString('en-ZA',
+        h.innerHTML='<span class="n">'+D(e.date).toLocaleDateString('en-GB',
           {weekday:'short',day:'numeric',month:'short',year:'numeric'})+
           '</span><span class="t num">'+cycName(e.cyc||cycStart(e.date))+'</span>';
         box.appendChild(h);
@@ -2186,85 +2000,32 @@
       .filter(cs=>cs<cur&&leftoverOf(cs)>0.5).sort();
   }
 
-  let vaultMode='save', lastPotCur='ZAR';
-  function updateVaultUI(){
-    const cur=$('vaultCur').value;
-    $('vaultAmtLbl').textContent='Amount ('+SYM[cur]+')';
-    if(vaultMode==='save'){
-      $('vaultHint').textContent='It comes out of your spending money and stops rolling into next month.';
-    }else{
-      const bal=savingsTotals()[cur]||0;
-      $('vaultHint').textContent='Comes back into this month’s spending money. You have '+
-        RC(bal,cur)+' put away in this pot.';
-    }
-    const converted=$('vaultConverted').checked;
-    $('vaultRecvRow').style.display=(vaultMode==='unsave'&&converted)?'block':'none';
-  }
+  let vaultMode='save';
   function openVault(mode,preset,label,intoCyc){
     vaultMode=mode;
     if(intoCyc)$('vaultAmt').dataset.cyc=intoCyc; else delete $('vaultAmt').dataset.cyc;
+    const bal=savingsTotal();
     $('vaultTitle').textContent=mode==='save'?'Move money to savings':'Take from savings';
-    $('vaultConverted').checked=false;
-    $('vaultConvRow').style.display=mode==='unsave'?'block':'none';
-    if(mode==='save'){
-      $('vaultPotRow').style.display='block';
-      $('vaultCurLbl').textContent='Put it in which currency';
-      [...$('vaultCur').options].forEach(o=>o.hidden=false);
-      $('vaultCur').value=preset?'ZAR':lastPotCur;
-    }else if(preset){
-      // an automated sweep reversal (a shortfall pulled back out) always deals in rand —
-      // it's reversing a rand figure calc() worked out, never a manual pot choice
-      $('vaultPotRow').style.display='none';
-      [...$('vaultCur').options].forEach(o=>o.hidden=false);
-      $('vaultCur').value='ZAR';
-    }else{
-      const active=potCurs();
-      $('vaultCurLbl').textContent='Which pot';
-      if(active.length>1){
-        $('vaultPotRow').style.display='block';
-        [...$('vaultCur').options].forEach(o=>o.hidden=active.indexOf(o.value)<0);
-        $('vaultCur').value=active[0];
-      }else{
-        $('vaultPotRow').style.display='none';
-        [...$('vaultCur').options].forEach(o=>o.hidden=false);
-        $('vaultCur').value=active[0]||'ZAR';
-      }
-    }
+    $('vaultHint').textContent=mode==='save'
+      ? 'It comes out of your spending money and stops rolling into next month.'
+      : 'Comes back into this month’s spending money. You have '+R(bal)+' put away.';
     $('vaultAmt').value=preset||'';
-    $('vaultRecv').value='';
     $('vaultNote').value=label||'';
-    updateVaultUI();
     $('vaultDlg').showModal();
   }
-  $('vaultCur').onchange=updateVaultUI;
-  $('vaultConverted').onchange=updateVaultUI;
   $('vaultCancel').onclick=()=>$('vaultDlg').close();
   $('vaultSave').onclick=()=>{
     const a=Number($('vaultAmt').value);
     if(!a||a<=0){$('vaultAmt').focus();return}
-    const cur=$('vaultCur').value;
-    if(vaultMode==='unsave'&&a>(savingsTotals()[cur]||0)+0.5){
-      alert('You only have '+RC(savingsTotals()[cur]||0,cur)+' in this pot.');return;
+    if(vaultMode==='unsave'&&a>savingsTotal()+0.5){
+      alert('You only have '+R(savingsTotal())+' put away.');return;
     }
     const t=today();
     const into=$('vaultAmt').dataset.cyc;
     const cyc=into||cycStart(t);
     const date=into?cycEnd(into):t;
-    const e={id:Date.now()+Math.random(),cat:'Savings',
+    const e={id:Date.now()+Math.random(),amt:a,cat:'Savings',
       note:$('vaultNote').value.trim(),date,type:vaultMode,cyc};
-    if(vaultMode==='save'){
-      lastPotCur=cur;
-      if(cur==='ZAR'){e.amt=a}
-      else{e.cur=cur;e.orig=a;e.rate=data.rates[cur]||1;e.amt=a*e.rate}
-    }else{
-      if(cur==='ZAR'){e.amt=a}
-      else{
-        e.cur=cur;e.orig=a;
-        const converted=$('vaultConverted').checked, recv=Number($('vaultRecv').value);
-        if(converted&&recv>0){e.amt=recv;e.rate=recv/a}
-        else{e.rate=data.rates[cur]||1;e.amt=a*e.rate}
-      }
-    }
     ensureCycCur(e.cyc);
     data.entries.push(e);
     delete $('vaultAmt').dataset.cyc;
@@ -2276,14 +2037,11 @@
   function renderVaultLog(){
     const moves=data.entries.filter(e=>isSave(e)||isUnsave(e))
       .slice().sort((a,b)=>a.date<b.date?1:-1);
-    const totals=savingsTotals();
-    const curs=Object.keys(totals).filter(c=>Math.abs(totals[c])>0.01);
     $('vaultLogSum').textContent=moves.length
-      ? (curs.length?curs.map(c=>RC(totals[c],c)).join(' · ')+' put away':R(0)+' put away')
+      ? R(savingsTotal())+' put away'
       : 'Nothing moved into savings yet.';
     renderDays($('vaultLogList'),moves,0,today(),false);
   }
-
   $('vaultOpen').onclick=()=>{renderVaultLog();$('vaultLog').showModal()};
   $('closeVaultLog').onclick=()=>$('vaultLog').close();
   $('vaultAddMore').onclick=()=>{$('vaultLog').close();openVault('save','','')};
@@ -2416,7 +2174,7 @@
         li.onclick=()=>openBill(b);
         li.innerHTML='<span class="dot">✓</span>'+
           '<span class="n"><s>'+b.n+'</s><em>'+
-          (m?D(m.date).toLocaleDateString('en-ZA',{day:'numeric',month:'short'})+
+          (m?D(m.date).toLocaleDateString('en-GB',{day:'numeric',month:'short'})+
               (Math.abs(m.amt-billZar(b))>1?' · came to '+R(m.amt):'')
             :'marked paid, not recorded here')+'</em></span>'+
           '<span class="a num">'+R(m?m.amt:billZar(b))+'</span>';
@@ -2676,22 +2434,7 @@
     let changed=false;
     if(d!==data.day){data.day=d;changed=true}
     if(g!==data.goal){data.goal=g;changed=true}
-    const hc=$('sHomeCur').value;
-    if(hc&&hc!==data.homeCur){data.homeCur=hc;changed=true}
-    ['GBP','USD','GHS','EUR'].forEach(k=>{const v=Number($('r'+k).value);
-      if(v&&v!==data.rates[k]){data.rates[k]=v;data.ratesAt=today();changed=true}});
-    // read before any anchor change below, since setAnchor's refile() repopulates this
-    // very field from data — reading it after would just see its own old value echoed back.
-    // compared against dataset.orig (what it showed when Settings opened), not against
-    // curForCyc() live — a Default currency change earlier in this same save can shift what
-    // curForCyc() returns, which would make an untouched dropdown look like a deliberate edit
-    const cc=$('sCycCur').value, ccChanged=cc&&cc!==$('sCycCur').dataset.orig;
-    if(st&&st!==cycStart(today())){setAnchor(st);changed=true}
-    // applied against the cycle that's actually open once the anchor above takes effect
-    const openCyc=cycStart(today());
-    if(ccChanged){
-      data.cycCur[openCyc]=cc; data.cycRate[openCyc]=data.rates[cc]||1; changed=true;
-    }
+    if(st&&st!==cycStart(today())){setAnchor(st);return}
     if(changed)refile();
   }
   const REDUCE_MOTION=matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -2768,12 +2511,12 @@
   });
 
   const TABFOR={findDlg:'openFind',histDlg:'openHist',monthDlg:'openHist',
-                setDlg:'openSet',allDlg:'openFind',investDlg:'openInvest'};
+                setDlg:'openSet',allDlg:'openFind'};
   function syncTabbar(){
     const open=[...document.querySelectorAll('dialog')].filter(x=>x.open).map(x=>x.id);
     const active=open.map(id=>TABFOR[id]).filter(Boolean).pop()
       || (document.activeElement===$('amt')?'quickAdd':null);
-    ['quickAdd','openFind','openHist','openInvest','openSet'].forEach(id=>
+    ['quickAdd','openFind','openHist','openSet'].forEach(id=>
       $(id).classList.toggle('on',id===active));
   }
   document.querySelectorAll('dialog').forEach(dl=>dl.addEventListener('close',syncTabbar));
@@ -2902,14 +2645,10 @@
       ? 'Your iPhone has Reduce Transparency switched on, so surfaces stay solid whatever this says.'
       : 'Cards, sheets and the bottom bar blur what is behind them. If your iPhone has Reduce '+
         'Transparency switched on, this stays off to match it.';
-    $('rGBP').value=data.rates.GBP;$('rUSD').value=data.rates.USD;$('rGHS').value=data.rates.GHS;$('rEUR').value=data.rates.EUR;
     const _cs=cycStart(today());
     $('sStart').value=_cs;
     $('startNow').textContent='Right now this month runs '+cycRange(_cs)+
       ' and is called '+cycName(_cs)+'.';
-    $('sCycCur').value=curForCyc(_cs);
-    $('sCycCur').dataset.orig=curForCyc(_cs);
-    $('sHomeCur').value=data.homeCur||'ZAR';
     const exNow=exCats();
     const el=$('exList'); el.innerHTML='';
     const allCats=LIVING.concat(SHOP,BILLS,customs().map(c=>c.n));
@@ -2926,7 +2665,7 @@
       el.appendChild(w);
     });
 
-    const POTDEF=['Uber Eats','Mr D','Take out','Bella Mare Cafe','Eating out'];
+    const POTDEF=['Uber Eats','Take out','Eating out'];
     const chosen=(data.potCats&&data.potCats.length)?data.potCats:POTDEF;
     const pl=$('potList'); pl.innerHTML='';
     const foodish=LIVING.concat(customs().filter(c=>(c.g||'Living')==='Living').map(c=>c.n));
@@ -3011,42 +2750,18 @@
     fillGauge();
     $('buildLine').textContent='Version '+BUILD+'.';
     $('ghTok').value=data.tok||'';
-    $('avKey').value=data.avKey||'';
     if(data.tok&&data.gistId)$('syncState').innerHTML='Connected \u00b7 last saved '+
       (data.lastBackup||'never')+'. Changes sync a few seconds after you make them.<br>'+
       'Gist ID for another device: <b>'+data.gistId+'</b>';
-    $('ratesAge').textContent=data.ratesAt?'Rates last set '+
-      D(data.ratesAt).toLocaleDateString('en-ZA',{day:'numeric',month:'short',year:'numeric'})+
-      '. Wise takes its cut on top, so edit these to what you actually received.':'';
   }
 
   function showConv(){
-    const c=$('cur').value, v=Number($('amt').value);
-    $('conv').textContent=(c==='ZAR'||!v)?'':
-      SYM[c]+v.toLocaleString('en-ZA')+' = '+R(v*data.rates[c])+' at R'+data.rates[c]+' to the '+c;
-    const zar=c==='ZAR'?v:v*data.rates[c];
+    const v=Number($('amt').value);
     const daily=lastCalc&&lastCalc.baseDaily;
     $('dayPreview').textContent=(kind==='out'&&v&&daily>0)
-      ?(zar/daily).toFixed(1)+' days of your allowance':'';
+      ?(v/daily).toFixed(1)+' days of your allowance':'';
   }
-  $('cur').onchange=showConv; $('amt').oninput=showConv;
-  $('startToday').onchange=()=>{
-    $('cycCurRow').style.display=$('startToday').checked?'flex':'none';
-    if($('startToday').checked)$('cycCurSel').value=curForCyc(cycStart(today()));
-  };
-  ['GBP','USD','GHS','EUR'].forEach(k=>{$('r'+k).onchange=e=>{
-    data.rates[k]=Number(e.target.value)||data.rates[k];data.ratesAt=today();save();fillSet();showConv()}});
-  $('refreshRates').onclick=async()=>{
-    const b=$('refreshRates'); b.textContent='Fetching…';
-    try{
-      const r=await fetch('https://open.er-api.com/v6/latest/ZAR');
-      const j=await r.json();
-      if(!j.rates)throw 0;
-      ['GBP','USD','GHS','EUR'].forEach(k=>{if(j.rates[k])data.rates[k]=Math.round(1/j.rates[k]*100)/100});
-      data.ratesAt=today();save();fillSet();showConv();b.textContent='Rates updated';
-    }catch(e){b.textContent='Could not fetch — enter them by hand'}
-    setTimeout(()=>{b.textContent="Fetch today's rates"},2600);
-  };
+  $('amt').oninput=showConv;
 
   // the app can sit open past midnight; without this, "today" stays yesterday
   let dayStamp=null;
@@ -3148,7 +2863,7 @@
       if(!r.ok)throw new Error(r.status);
       const j=await r.json();
       data.gistId=j.id; data.lastBackup=today(); data.syncedRev=data.rev||Date.now(); S.set(KEY,data);
-      st.textContent='Synced '+new Date().toLocaleTimeString('en-ZA',{hour:'2-digit',minute:'2-digit'})+
+      st.textContent='Synced '+new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})+
         '. Every change from now on saves itself.';
       showBanner(); showBillBanner(); showIncBanner(); return true;
     }catch(e){
@@ -3227,7 +2942,7 @@
     const inc=dueIncomes(cycStart(today()))[0];
     if(!inc)return;
     setKind('in');render();
-    $('amt').value=inc.a; $('cur').value=inc.cur||'ZAR'; showConv();
+    $('amt').value=inc.a; showConv();
     $('logCard').scrollIntoView({behavior:'smooth',block:'center'});
     setTimeout(()=>$('amt').focus(),350);
   };
@@ -3243,40 +2958,24 @@
     }
     push(false);
   };
-  $('avKey').onchange=e=>{data.avKey=e.target.value.trim();save()};
   $('pullNow').onclick=()=>pull(false);
-  const holds=()=>data.holdings||[];
-  const holdValue=h=>(h.units>0&&h.price>0)?h.units*h.price:(Number(h.val)||0);
-  const investedTotal=()=>holds().reduce((s,h)=>s+(Number(h.in)||0),0);
-  const worthTotal=()=>holds().reduce((s,h)=>s+holdValue(h),0);
-  // a holding's own currency is just how it's displayed — R() everywhere else in the app is
-  // untouched, this only affects the Investments card and its dialog
-  const RC=(n,cur)=>fmtMoney(n,cur);
-  // the total only makes sense in one currency at a time — while every holding shares one,
-  // that's exact; ponytail: a genuinely mixed portfolio falls back to a raw ZAR sum here,
-  // not a real conversion, since nothing has asked for that yet
-  const investCur=()=>{
-    const curs=[...new Set(holds().map(h=>h.cur||'ZAR'))];
-    return curs.length===1?curs[0]:'ZAR';
-  };
 
   // Which shop maps to which category. Cheap, but it gets the common ones right.
   const SHOPHINTS=[
-    [/uber\s*eats|ubereats/i,'Uber Eats'],[/mr\s*d/i,'Mr D'],
-    [/kfc|nando|mcdonald|steers|debonair|chicken licken|romans/i,'Take out'],
-    [/bella\s*mare/i,'Bella Mare Cafe'],
-    [/checkers|woolworth|pick\s*n\s*pay|spar|shoprite|food\s*lover|makro/i,'Groceries'],
-    [/takealot/i,'Takealot'],[/amazon/i,'Amazon'],[/shein/i,'Shein'],[/temu/i,'Temu'],
+    [/uber\s*eats|ubereats|deliveroo|just\s*eat/i,'Uber Eats'],
+    [/kfc|nando|mcdonald|burger king|greggs|subway/i,'Take out'],
+    [/tesco|sainsbury|asda|morrison|aldi|lidl|waitrose|co-?op/i,'Groceries'],
+    [/amazon/i,'Amazon'],[/shein/i,'Shein'],[/temu/i,'Temu'],
     [/uber(?!\s*eats)|bolt|taxi/i,'Transport'],
-    [/clicks|dis-?chem|pharmacy/i,'Health'],
-    [/vodacom|mtn|telkom|cell\s*c|rain/i,'Phone / data'],
-    [/eskom|prepaid\s*electric/i,'Electricity']
+    [/boots|superdrug|pharmacy/i,'Health'],
+    [/ee\b|o2\b|vodafone|three\b|giffgaff|tesco mobile/i,'Phone / data'],
+    [/british gas|edf|octopus energy|e\.?on|scottish power/i,'Electricity']
   ];
 
   function readReceipt(raw){
     const text=String(raw||'');
     const lines=text.split(/\n+/).map(x=>x.trim()).filter(Boolean);
-    const money=/(?:R|ZAR)?\s*(\d{1,3}(?:[ ,]\d{3})*(?:[.,]\d{2})|\d+[.,]\d{2})/i;
+    const money=/(?:£|GBP)?\s*(\d{1,3}(?:[ ,]\d{3})*(?:[.,]\d{2})|\d+[.,]\d{2})/i;
     const num=t=>Number(String(t).replace(/[ ,](?=\d{3})/g,'').replace(',','.'));
 
     // the total: prefer a line that says so, else the largest amount on the receipt
@@ -3346,194 +3045,11 @@
     $('logCard').scrollIntoView({behavior:'smooth',block:'center'});
   };
 
-  let editHold=null;
-  function holdCurChanged(){
-    const sym=SYM[$('holdCur').value]||'R';
-    $('holdInLabel').textContent='Money put in ('+sym+')';
-    $('holdValLabel').textContent='Worth now ('+sym+')';
-    $('holdPriceLabel').textContent='Price each ('+sym+')';
-  }
-  $('holdCur').onchange=holdCurChanged;
-  function openHold(h){
-    editHold=h||null;
-    $('holdTitle').textContent=h?'Edit '+h.n:'New holding';
-    $('holdName').value=h?h.n:'';
-    $('holdKind').value=h?(h.kind||'etf'):'etf';
-    $('holdCur').value=h&&h.cur?h.cur:'ZAR';
-    holdCurChanged();
-    $('holdSym').value=h&&h.sym?h.sym:'';
-    $('holdIn').value=h&&h.in?h.in:'';
-    $('holdVal').value=h?(Math.round(holdValue(h)*100)/100||''):'';
-    $('holdUnits').value=h&&h.units?h.units:'';
-    $('holdPrice').value=h&&h.price?h.price:'';
-    $('holdNote').value=h&&h.note?h.note:'';
-    $('holdDelete').style.display=h?'block':'none';
-    $('holdDlg').showModal();
-    setTimeout(()=>$('holdName').focus(),150);
-  }
-  $('holdCancel').onclick=()=>$('holdDlg').close();
-  $('holdDelete').onclick=()=>{
-    if(!editHold)return;
-    if(!confirm('Remove '+editHold.n+' from your investments?'))return;
-    data.holdings=holds().filter(x=>x.id!==editHold.id);
-    editHold=null; save(); $('holdDlg').close();
-    if($('investDlg').open)renderInvest();
-  };
-  $('holdSave').onclick=()=>{
-    const n=$('holdName').value.trim();
-    if(!n){$('holdName').focus();return}
-    const rec={n,kind:$('holdKind').value,cur:$('holdCur').value,sym:$('holdSym').value.trim(),
-      in:Number($('holdIn').value)||0,units:Number($('holdUnits').value)||0,
-      price:Number($('holdPrice').value)||0,val:Number($('holdVal').value)||0,
-      note:$('holdNote').value.trim()};
-    data.holdings=holds().slice();
-    if(editHold)data.holdings=data.holdings.map(x=>
-      x.id===editHold.id?Object.assign({id:x.id,at:x.at},rec):x);
-    else data.holdings.push(Object.assign(
-      {id:'h'+Date.now()+Math.random().toString(36).slice(2,7)},rec));
-    editHold=null; save(); $('holdDlg').close();
-    if($('investDlg').open)renderInvest();
-  };
-
-  // best-effort price refresh: CoinGecko for crypto, Stooq for shares and ETFs.
-  // Anything that fails keeps whatever price it already had.
-  async function refreshPrices(){
-    const btn=$('invRefresh'); btn.textContent='Updating…';
-    let done=0; const failedSyms=[];
-    const coins=holds().filter(h=>h.kind==='crypto'&&h.sym);
-    if(coins.length){
-      try{
-        const ids=coins.map(h=>h.sym.toLowerCase()).join(',');
-        // fetch in whatever currency each coin is actually tagged as (default ZAR), not
-        // always ZAR regardless — a crypto holding set to USD was getting a raw ZAR number
-        // formatted with a $ sign, since RC() trusts h.cur but this always fetched zar
-        const currs=[...new Set(coins.map(h=>(h.cur||'ZAR').toLowerCase()))];
-        const r=await fetch('https://api.coingecko.com/api/v3/simple/price?ids='+
-          encodeURIComponent(ids)+'&vs_currencies='+encodeURIComponent(currs.join(',')));
-        const j=await r.json();
-        coins.forEach(h=>{
-          const cur=(h.cur||'ZAR').toLowerCase();
-          const px=j[h.sym.toLowerCase()]&&j[h.sym.toLowerCase()][cur];
-          if(px){h.price=px;h.at=today();done++}else failedSyms.push(h.sym);
-        });
-      }catch(e){coins.forEach(h=>failedSyms.push(h.sym))}   // CoinGecko unreachable — name every coin, not just "could not fetch"
-    }
-    const stocks=holds().filter(x=>x.sym&&x.kind!=='crypto'&&x.kind!=='cash');
-    let noKey=false;
-    if(stocks.length&&!data.avKey){
-      noKey=true; stocks.forEach(h=>failedSyms.push(h.sym));
-    }else for(const h of stocks){
-      try{
-        // stooq's CSV endpoint (used here previously) was discontinued and never sent CORS
-        // headers anyway, so it could never work from a real browser — alphavantage does both
-        const r=await fetch('https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol='+
-          encodeURIComponent(h.sym)+'&apikey='+encodeURIComponent(data.avKey));
-        const j=await r.json();
-        const px=Number(j['Global Quote']&&j['Global Quote']['05. price']);
-        if(px>0){h.price=px;h.at=today();done++}else failedSyms.push(h.sym);
-      }catch(e){failedSyms.push(h.sym)}
-      // alphavantage's actual burst limit is ~1 request/second (confirmed against a live
-      // key: a tighter gap silently dropped some quotes to a rate-limit response, not an
-      // error — verified live, not assumed). ponytail: still a fixed gap, not real
-      // request-counting, but matches what's actually enforced rather than a guess.
-      await new Promise(res=>setTimeout(res,1100));
-    }
-    if(done)data.invAt=today();
-    save();
-    // boot fires this without awaiting it, then snapshots the day's history immediately —
-    // if any price actually updated, the snapshot taken before this resolved was stale.
-    // re-snapshot now so a day's history reflects the fetch, not just whatever was on hand
-    // the moment the page loaded.
-    if(done)snapshotInvest();
-    if($('investDlg').open)renderInvest();
-    const names=n=>n.length>3?n.slice(0,3).join(', ')+' and '+(n.length-3)+' more':n.join(', ');
-    btn.textContent=noKey&&!done?'Add an Alpha Vantage key in Settings for '+names(failedSyms)
-      :!failedSyms.length?(done?'Updated '+done:'Nothing to fetch')
-      :done?'Updated '+done+', not '+names(failedSyms)
-      :'Could not fetch '+names(failedSyms);
-    setTimeout(()=>{btn.textContent='Update prices'},2600);
-  }
-  $('invRefresh').onclick=refreshPrices;
-  $('invAdd').onclick=()=>openHold(null);
-  $('openInvest').onclick=()=>{renderInvest();$('investDlg').showModal()};
-  $('closeInvest').onclick=()=>$('investDlg').close();
-
-  // one snapshot a day, so there is something to compare against later
-  function snapshotInvest(){
-    if(!holds().length)return;
-    data.invHist=data.invHist||[];
-    const t=today(), worth=Math.round(worthTotal()), put=Math.round(investedTotal());
-    const last=data.invHist[data.invHist.length-1];
-    if(last&&last.d===t){
-      if(last.w!==worth||last.i!==put){last.w=worth;last.i=put;S.set(KEY,data)}
-      return;
-    }
-    data.invHist.push({d:t,w:worth,i:put});
-    if(data.invHist.length>400)data.invHist=data.invHist.slice(-400);
-    S.set(KEY,data);
-  }
-  function investTrend(){
-    const h=data.invHist||[];
-    if(h.length<2)return null;
-    const now=h[h.length-1];
-    const wants=addDays(today(),-30);
-    let ref=h[0];
-    for(const pnt of h){ if(pnt.d<=wants)ref=pnt; }
-    if(ref.d===now.d)return null;
-    return {days:diff(ref.d,now.d), change:now.w-ref.w,
-            pct:ref.w>0?((now.w-ref.w)/ref.w*100):0};
-  }
-
-  function renderInvest(){
-    const list=$('invList'), hs=holds();
-    if(!hs.length){
-      $('invValue').textContent=R(0); $('invValue').className='num';
-      $('invSub').textContent='nothing tracked yet — tap to add one';
-      list.innerHTML='';
-      $('invFoot').textContent='Kept separate from your spending money.';
-      return;
-    }
-    const worth=worthTotal(), put=investedTotal(), gain=worth-put, dispCur=investCur();
-    $('invValue').textContent=RC(worth,dispCur);
-    $('invValue').className='num '+(put>0?(gain>=0?'up':'down'):'');
-    $('invSub').textContent=put>0
-      ? RC(put,dispCur)+' put in · '+(gain>=0?'up ':'down ')+RC(Math.abs(gain),dispCur)+
-        ' ('+(gain/put*100).toFixed(1)+'%)'
-      : 'tap to add another';
-    list.innerHTML='';
-    hs.slice().sort((a,b)=>holdValue(b)-holdValue(a)).forEach(h=>{
-      const v=holdValue(h), g=v-(Number(h.in)||0);
-      const row=document.createElement('div'); row.className='irow';
-      row.style.cursor='pointer';
-      row.onclick=()=>openHold(h);
-      row.innerHTML='<span class="dot">'+
-        ({etf:'📈',stock:'🏦',crypto:'₿',cash:'💰',other:'🏷'}[h.kind]||'🏷')+'</span>'+
-        '<span class="in"><s>'+h.n+'</s><em>'+
-        [h.units>0?h.units+' at '+RC(h.price,h.cur):'',h.sym||'',h.note||'']
-          .filter(Boolean).join(' · ')+'</em></span>'+
-        '<span class="iv"><b>'+RC(v,h.cur)+'</b><span class="'+(g>=0?'up':'down')+'">'+
-        (h.in>0?((g>=0?'+':'')+RC(g,h.cur)):'')+'</span></span>';
-      list.appendChild(row);
-    });
-    const tr=investTrend();
-    $('invFoot').textContent=(tr
-      ? (tr.change>=0?'Up ':'Down ')+RC(Math.abs(tr.change),dispCur)+' ('+tr.pct.toFixed(1)+
-        '%) over '+tr.days+(tr.days===1?' day':' days')+'. '
-      : '')+
-      'Separate from your spending money'+
-      (data.invAt?' · prices last updated '+
-        D(data.invAt).toLocaleDateString('en-ZA',{day:'numeric',month:'short'})
-        :' · prices are whatever you typed');
-  }
-
   let editBill=null;
   function openBill(b){
     editBill=b||null;
     $('billName').value=b?b.n:'';
     $('billAmt').value=b?b.a:'';
-    $('billCur').value=b&&b.cur?b.cur:'ZAR';
-    $('billZar').value=b&&b.zar>0?b.zar:'';
-    billCurChanged();
     $('billCat').innerHTML=catOptions(false);
     $('billCat').value=b?b.cat:'Rent';
     $('billNote').value=b&&b.note?b.note:'';
@@ -3548,29 +3064,12 @@
     $('billDlg').showModal();
     setTimeout(()=>$('billName').focus(),150);
   }
-  function billCurChanged(){
-    const c=$('billCur').value, a=Number($('billAmt').value)||0;
-    $('billZarRow').style.display=c==='ZAR'?'none':'block';
-    if(c==='ZAR')return;
-    const rate=Number(data.rates[c])||1;
-    const cur=editBill&&editBill.cur===c&&editBill.rate;
-    $('billZarHint').textContent=
-      (cur?'Currently locked at R'+editBill.rate+' to the '+c+
-           (editBill.rateAt?' from '+D(editBill.rateAt).toLocaleDateString('en-ZA',
-             {day:'numeric',month:'short'}):'')+'. Saving re-locks it at today\u2019s R'+rate+'. '
-          :'')+
-      'At today\u2019s Wise rate of R'+rate+' to the '+c+', '+SYM[c]+(a||0)+
-      ' comes to '+R(a*rate)+'. Fill the box in only if your bank charged something different — '+
-      'either way the rand figure is fixed once you save.';
-  }
   function billEveryChanged(){
     const yearly=$('billEvery').value==='year';
     $('billMonthRow').style.display=yearly?'block':'none';
     $('billSpreadRow').style.display=yearly?'flex':'none';
   }
   $('billEvery').onchange=billEveryChanged;
-  $('billCur').onchange=billCurChanged;
-  $('billAmt').oninput=billCurChanged;
 
   $('billDelete').onclick=()=>{
     if(!editBill)return;
@@ -3583,19 +3082,11 @@
   $('billSave').onclick=()=>{
     const n=$('billName').value.trim(), a=Number($('billAmt').value), cat=$('billCat').value;
     const note=$('billNote').value.trim();
-    const cur=$('billCur').value, typed=Number($('billZar').value)||0;
     if(!n){$('billName').focus();return}
     if(!a||a<=0){$('billAmt').focus();return}
-    let zar=0, rate=0, zarManual=false, rateAt='';
-    if(cur!=='ZAR'){
-      rate=Number(data.rates[cur])||1;
-      zarManual=typed>0;
-      zar=typed>0?typed:Math.round(a*rate*100)/100;   // locked in from here on
-      rateAt=today();
-    }
     const labels=$('billLabels').value.split(',').map(x=>x.trim()).filter(Boolean);
     const every=$('billEvery').value;
-    const rec={n,a,cat,note,cur,zar,rate,zarManual,rateAt,labels,every,
+    const rec={n,a,cat,note,labels,every,
                month:every==='year'?Number($('billMonth').value):undefined,
                spread:every==='year'?$('billSpread').checked:undefined};
     data.bills=expected().slice();
@@ -3615,7 +3106,6 @@
     editInc=inc||null;
     $('incName').value=inc?inc.n:'';
     $('incAmt').value=inc?inc.a:'';
-    $('incCur').value=inc&&inc.cur?inc.cur:'ZAR';
     $('incMonth').innerHTML=MONTHNAMES.map((m,n)=>'<option value="'+(n+1)+'">'+m+'</option>').join('');
     $('incEvery').value=inc&&inc.every?inc.every:'month';
     $('incMonth').value=inc&&inc.month?inc.month:String(D(today()).getMonth()+1);
@@ -3637,11 +3127,11 @@
   };
   $('incCancel').onclick=()=>$('incDlg').close();
   $('incSave').onclick=()=>{
-    const n=$('incName').value.trim(), a=Number($('incAmt').value), cur=$('incCur').value;
+    const n=$('incName').value.trim(), a=Number($('incAmt').value);
     if(!n){$('incName').focus();return}
     if(!a||a<=0){$('incAmt').focus();return}
     const every=$('incEvery').value;
-    const rec={n,a,cur,every,month:every==='year'?Number($('incMonth').value):undefined};
+    const rec={n,a,every,month:every==='year'?Number($('incMonth').value):undefined};
     data.incomes=expectedIncomes().slice();
     if(editInc){
       data.incomes=data.incomes.map(x=>x.id===editInc.id?Object.assign({id:x.id},rec):x);
@@ -3668,13 +3158,9 @@
       }
     }
     if(s)data=Object.assign(data,s);
-    // old saved data predates EUR/cycCur/cycRate — fill in what's missing rather than
-    // letting Object.assign's shallow merge silently drop them
-    if(!data.rates.EUR)data.rates.EUR=18.75;
-    data.cycCur=data.cycCur||{}; data.cycRate=data.cycRate||{}; data.homeCur=data.homeCur||'ZAR';
+    data.rates={GBP:1};
+    data.cycCur=data.cycCur||{}; data.cycRate=data.cycRate||{}; data.homeCur='GBP';
     data.entries.forEach(e=>{if(!e.cyc)e.cyc=cycStart(e.date)});
-    // every cycle that already has entries gets pinned to rand now, before a default
-    // currency setting can exist to retroactively change what they'd otherwise fall back to
     [...new Set(data.entries.map(e=>e.cyc))].forEach(ensureCycCur);
     // clear out anything left from the old receipts feature
     const oldShots=data.entries.filter(e=>e.rcpt);
@@ -3684,25 +3170,6 @@
     }
     applyTheme();fillSet();setKind('out');$('when').value=today();render();showBanner();showBillBanner();showIncBanner();
     watchTheClock();
-    if(data.ratesAt&&diff(data.ratesAt,today())>=1){
-      try{
-        const r=await fetch('https://open.er-api.com/v6/latest/ZAR');
-        const j=await r.json();
-        if(j&&j.rates){
-          ['GBP','USD','GHS','EUR'].forEach(k=>{
-            if(j.rates[k])data.rates[k]=Math.round(1/j.rates[k]*100)/100});
-          data.ratesAt=today(); S.set(KEY,data); fillSet(); render();
-        }
-      }catch(e){}
-    }
-    // once a day, on open — not hourly, and not while closed: a PWA on iOS can't run in
-    // the background, so "the moment you open it" is the honest version of automatic
-    if(holds().some(h=>h.sym)&&(!data.invAt||diff(data.invAt,today())>=1)){
-      refreshPrices().catch(()=>{});
-    }
-    // moved out of renderInvest() — investments now live behind their own tab, so this
-    // must not depend on the user ever opening it, same reasoning as the block above
-    snapshotInvest();
     document.addEventListener('visibilitychange',()=>{
       if(document.visibilityState!=='visible'||!data.tok||!data.gistId)return;
       remote().then(rm=>{

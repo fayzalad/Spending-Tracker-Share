@@ -267,7 +267,7 @@ const seed = {
   $('billAmt').value = '500';
   $('billSave').click();
   ok('editing an amount updates the tile', num($('due').textContent) === 729, $('due').textContent);
-  ok('sheet refreshes behind it', $('subsSum').textContent.includes('R729'), $('subsSum').textContent);
+  ok('sheet refreshes behind it', $('subsSum').textContent.includes('£729'), $('subsSum').textContent);
 
   [...d.querySelectorAll('#subsList li .n')].find(x => x.textContent.includes('Netflix')).click();
   $('billDelete').click();
@@ -291,11 +291,10 @@ const seed = {
   $('tabMonth').click();
   ok('leftover still counted as spendable at first', num($('secVal').textContent) === 26795,
      $('secVal').textContent);
-  const flat = t => t.replace(/\s/g, ' ');   // en-ZA uses a non-breaking thousands space
-  ok('offers to put last month away', flat($('sweepBox').textContent).includes('6 000'),
+  ok('offers to put last month away', $('sweepBox').textContent.includes('6,000'),
      $('sweepBox').textContent.slice(0, 120));
   const beforeSafe = num($('safe').textContent);
-  const sweepBtn = [...d.querySelectorAll('#sweepBox button')].find(b => /Save R/.test(b.textContent));
+  const sweepBtn = [...d.querySelectorAll('#sweepBox button')].find(b => /Save £/.test(b.textContent));
   ok('offers a Save button for the leftover', !!sweepBtn,
      [...d.querySelectorAll('#sweepBox button')].map(b => b.textContent).join(' / '));
   sweepBtn.click();
@@ -307,7 +306,7 @@ const seed = {
      num($('vault').textContent) === 0, $('vault').textContent);
   ok('and it left the spendable pot', num($('secVal').textContent) === 20795, $('secVal').textContent);
   ok('safe per day drops accordingly', num($('safe').textContent) < beforeSafe);
-  ok('sweep offer clears', !flat($('sweepBox').textContent).includes('6 000'), $('sweepBox').textContent);
+  ok('sweep offer clears', !$('sweepBox').textContent.includes('6,000'), $('sweepBox').textContent);
   const swept = JSON.parse(w.localStorage.getItem('slip:v4')).entries.find(e => e.type === 'save');
   ok('filed back into the month it came from', swept.cyc === '2026-07-28', swept.cyc);
 
@@ -329,36 +328,14 @@ const seed = {
   ok('cannot withdraw more than you have', num($('vaultAll').textContent) === 4000,
      $('vaultAll').textContent);
 
-  console.log('\n=== 13. bills in other currencies ===');
-  const fx = JSON.parse(JSON.stringify(seed));
-  fx.rates = { ZAR: 1, GBP: 21.78, USD: 16.23, GHS: 1.4464 };
-  fx.bills = [
-    { id: 'f1', n: 'Claude', a: 23, cur: 'USD', zar: 0, cat: 'Subscriptions', note: '' },
-    { id: 'f2', n: 'NextDNS', a: 1.99, cur: 'USD', zar: 0, cat: 'Subscriptions', note: '' },
-    { id: 'f3', n: 'ChatGPT', a: 70, cur: 'GHS', zar: 101.25, cat: 'Subscriptions', note: '' }
-  ];
-  dom = await boot(fx); w = dom.window; d = w.document; $ = id => d.getElementById(id);
-  $('tabMonth').click();
-  // ChatGPT is already paid in this data, so only Claude + NextDNS are held back:
-  // 23*16.23 = 373.29 plus 1.99*16.23 = 32.30
-  ok('converts at the stored rate', Math.abs(num($('due').textContent) - 405.6) < 2, $('due').textContent);
-  $('dueStat').click();
-  ok('the cedi one auto-ticked off', $('subsList').textContent.includes('Already paid'));
-  ok('shows the original currency', $('subsList').textContent.includes('$23'),
-     $('subsList').textContent.slice(0, 140));
-  ok('pins the one you gave in rands', $('subsList').textContent.includes('R101'),
-     $('subsList').textContent.slice(0, 200));
-  [...d.querySelectorAll('#subsList .pay')].find(b => b.textContent === 'Log it').click();
-  ok('pay sheet offers the rand figure', Math.abs(Number($('payAmt').value) - 373.29) < 1, $('payAmt').value);
-
   console.log('\n=== 14. takeaway pot categories ===');
   const potSeed = JSON.parse(JSON.stringify(seed));
-  potSeed.entries.push({ id: 90, amt: 150, cat: 'Mr D', note: '', date: '2026-08-31', type: 'out', cyc: '2026-08-28' });
-  potSeed.entries.push({ id: 91, amt: 60, cat: 'Bella Mare Cafe', note: '', date: '2026-08-31', type: 'out', cyc: '2026-08-28' });
+  potSeed.entries.push({ id: 90, amt: 150, cat: 'Take out', note: '', date: '2026-08-31', type: 'out', cyc: '2026-08-28' });
+  potSeed.entries.push({ id: 91, amt: 60, cat: 'Eating out', note: '', date: '2026-08-31', type: 'out', cyc: '2026-08-28' });
   dom = await boot(potSeed); w = dom.window; d = w.document; $ = id => d.getElementById(id);
   const potNow = num($('pot').textContent);
   const potBase = await boot(seed).then(dd => num(dd.window.document.getElementById('pot').textContent));
-  ok('Mr D and the cafe count as food', potNow === potBase + 210, potBase + ' → ' + potNow);
+  ok('take out and eating out count as food', potNow === potBase + 210, potBase + ' → ' + potNow);
   ok('food tile shows a share', /% of your living spend/.test($('potSub').textContent),
      $('potSub').textContent);
   ok('last-order card appears', $('foodCard').style.display === 'block');
@@ -366,51 +343,11 @@ const seed = {
      $('foodAgo').textContent);
   ok('with an average order', num($('foodAvg').textContent) > 0, $('foodAvg').textContent);
   ok('and its cost in days', Number($('foodCost').textContent) > 0, $('foodCost').textContent);
-  ok('Mr D is in the category list', [...d.querySelectorAll('#cat option')].some(o => o.textContent === 'Mr D'));
+  ok('Uber Eats is in the category list', [...d.querySelectorAll('#cat option')].some(o => o.textContent === 'Uber Eats'));
   ok('Take out is in the list', [...d.querySelectorAll('#cat option')].some(o => o.textContent === 'Take out'));
-  ok('Bella Mare Cafe is in the list', [...d.querySelectorAll('#cat option')].some(o => o.textContent === 'Bella Mare Cafe'));
-
-  console.log('\n=== 15. conversions stay put when rates move ===');
-  const lock = JSON.parse(JSON.stringify(seed));
-  lock.rates = { ZAR: 1, GBP: 21.78, USD: 16.23, GHS: 1.4464 };
-  lock.bills = [];
-  dom = await boot(lock); w = dom.window; d = w.document; $ = id => d.getElementById(id);
-  $('tabMonth').click();
-  $('addBillBtn').click();
-  $('billName').value = 'Claude'; $('billAmt').value = '23';
-  $('billCur').value = 'USD'; $('billCur').dispatchEvent(new w.Event('change'));
-  $('billCat').value = 'Subscriptions';
-  $('billSave').click();
-  const lockedAt = num($('due').textContent);
-  ok('converted on save', Math.abs(lockedAt - 373) < 2, $('due').textContent);
-  let stored2 = JSON.parse(w.localStorage.getItem('slip:v4'));
-  ok('rand figure written to the bill', stored2.bills[0].zar > 0, JSON.stringify(stored2.bills[0]));
-  ok('rate recorded alongside it', stored2.bills[0].rate === 16.23, String(stored2.bills[0].rate));
-
-  // the rand tanks overnight
-  $('rUSD').value = '25'; $('rUSD').dispatchEvent(new w.Event('change'));
-  await new Promise(r => setTimeout(r, 60));
-  ok('the bill does NOT move with the rate', num($('due').textContent) === lockedAt,
-     lockedAt + ' → ' + num($('due').textContent));
-  $('dueStat').click();
-  ok('it still shows the rate it was locked at', $('subsList').textContent.includes('16.23'),
-     $('subsList').textContent.slice(0, 140));
-  $('closeSubs').click();
-
-  // an entry logged in dollars keeps its rand value too
-  $('amt').value = '10'; $('cur').value = 'USD';
-  $('cat').value = 'Other';
-  $('addBtn').click();
-  await new Promise(r => setTimeout(r, 60));
-  stored2 = JSON.parse(w.localStorage.getItem('slip:v4'));
-  const usdEntry = stored2.entries.find(e => e.cur === 'USD');
-  ok('entry converted at the rate of the day', usdEntry.amt === 250, String(usdEntry.amt));
-  $('rUSD').value = '30'; $('rUSD').dispatchEvent(new w.Event('change'));
-  await new Promise(r => setTimeout(r, 60));
-  stored2 = JSON.parse(w.localStorage.getItem('slip:v4'));
-  ok('and never re-converts afterwards',
-     stored2.entries.find(e => e.cur === 'USD').amt === 250,
-     String(stored2.entries.find(e => e.cur === 'USD').amt));
+  ok('Mr D is not in the list', ![...d.querySelectorAll('#cat option')].some(o => o.textContent === 'Mr D'));
+  ok('Bella Mare Cafe is not in the list', ![...d.querySelectorAll('#cat option')].some(o => o.textContent === 'Bella Mare Cafe'));
+  ok('Takealot is not in the list', ![...d.querySelectorAll('#cat option')].some(o => o.textContent === 'Takealot'));
 
   console.log('\n=== 16. double entries and the storage gauge ===');
   dom = await boot(seed, { confirm: false }); w = dom.window; d = w.document; $ = id => d.getElementById(id);
@@ -443,7 +380,7 @@ const seed = {
   console.log('\n=== 18. savings are visible and explorable ===');
   dom = await boot(twoMonths); w = dom.window; d = w.document; $ = id => d.getElementById(id);
   $('tabMonth').click();
-  [...d.querySelectorAll('#sweepBox button')].find(b => /Save R/.test(b.textContent)).click();
+  [...d.querySelectorAll('#sweepBox button')].find(b => /Save £/.test(b.textContent)).click();
   $('vaultSave').click();
   await new Promise(r => setTimeout(r, 60));
   ok('summary row shows nothing for an untouched month', $('saveCell').style.display === 'none',
@@ -460,7 +397,7 @@ const seed = {
   ok('savings card opens its history', $('vaultLog').open === true);
   ok('history lists both movements', d.querySelectorAll('#vaultLogList li').length === 2,
      String(d.querySelectorAll('#vaultLogList li').length));
-  ok('and totals them', /6 000|4 000/.test($('vaultLogSum').textContent.replace(/\s/g, ' ')),
+  ok('and totals them', /6,000|4,000/.test($('vaultLogSum').textContent),
      $('vaultLogSum').textContent);
   $('closeVaultLog').click();
 
@@ -471,9 +408,9 @@ const seed = {
   $('cat').value = 'Groceries';
   $('addBtn').click();
   await new Promise(r => setTimeout(r, 60));
-  const sweepTxt = $('sweepBox').textContent.replace(/\s/g, ' ');
-  ok('flags the shortfall', /is R2 500 short/.test(sweepTxt), sweepTxt.slice(0, 160));
-  ok('offers to pull it back', /Take R2 500 back/.test(sweepTxt), sweepTxt.slice(0, 200));
+  const sweepTxt = $('sweepBox').textContent;
+  ok('flags the shortfall', /is £2,500 short/.test(sweepTxt), sweepTxt.slice(0, 160));
+  ok('offers to pull it back', /Take £2,500 back/.test(sweepTxt), sweepTxt.slice(0, 200));
   const fixBtn = [...d.querySelectorAll('#sweepBox button')]
       .find(b => /Take/.test(b.textContent));
   fixBtn.click();
@@ -489,19 +426,19 @@ const seed = {
   ok('CSV header drops the column', !HTML_HAS_RECEIPT);
 
   console.log('\n=== 21. the goal and the savings tray agree ===');
-  const goalSeed = JSON.parse(JSON.stringify(seed));   // R20 795 in, R3 500 goal, nothing saved
+  const goalSeed = JSON.parse(JSON.stringify(seed));   // £20,795 in, £3,500 goal, nothing saved
   dom = await boot(goalSeed); w = dom.window; d = w.document; $ = id => d.getElementById(id);
   $('tabMonth').click();
   ok('card explains what is still held back',
-     /3 500 of your R3 500 goal still held back/.test($('vaultSub').textContent.replace(/\s/g, ' ')),
+     /3,500 of your £3,500 goal still held back/.test($('vaultSub').textContent),
      $('vaultSub').textContent);
   ok('offers to move it across',
-     /Put R3 500 away/.test($('sweepBox').textContent.replace(/\s/g, ' ')),
+     /Put £3,500 away/.test($('sweepBox').textContent),
      $('sweepBox').textContent.slice(0, 140));
   const dailyBefore = num($('safe').textContent);
   const onTrackBefore = num($('save').textContent);
 
-  [...d.querySelectorAll('#sweepBox button')].find(b => /Put R/.test(b.textContent)).click();
+  [...d.querySelectorAll('#sweepBox button')].find(b => /Put £/.test(b.textContent)).click();
   ok('prefilled with the whole goal', Number($('vaultAmt').value) === 3500, $('vaultAmt').value);
   $('vaultSave').click();
   await new Promise(r => setTimeout(r, 60));
@@ -518,7 +455,7 @@ const seed = {
   ok('and says the goal is done', /goal is done/.test($('vaultSub').textContent),
      $('vaultSub').textContent);
   ok('offer disappears once met',
-     !/Put R/.test($('sweepBox').textContent), $('sweepBox').textContent.slice(0, 120));
+     !/Put £/.test($('sweepBox').textContent), $('sweepBox').textContent.slice(0, 120));
   ok('goal reads as met', /already put away/.test($('saveSub').textContent), $('saveSub').textContent);
 
   console.log('\n=== 22. two devices merge instead of clobbering ===');
@@ -564,7 +501,7 @@ const seed = {
   const banked = num($('safe').textContent);
   ok('allowance is pot over days left', Math.abs(banked - 400) < 3, 'got ' + banked);
   ok('sub names tomorrow if you skip today',
-     /tomorrow becomes R417/.test($('safeSub').textContent), $('safeSub').textContent);
+     /tomorrow becomes £417/.test($('safeSub').textContent), $('safeSub').textContent);
 
   // spend R150 today — today's figure drops by exactly that
   $('amt').value = '150'; $('cat').value = 'Groceries'; $('addBtn').click();
@@ -576,7 +513,7 @@ const seed = {
      $('safeSub').textContent);
 
   // unspent money genuinely lifts tomorrow: R9 850 over 24 days = R410
-  ok('tomorrow rises when today is quiet', /tomorrow becomes R410/.test($('safeSub').textContent),
+  ok('tomorrow rises when today is quiet', /tomorrow becomes £410/.test($('safeSub').textContent),
      $('safeSub').textContent);
 
   // now blow past it
@@ -587,7 +524,7 @@ const seed = {
   ok('overspending goes negative', over < 0, String(over));
   ok('tile turns red', $('safe').className.includes('bad'), $('safe').className);
   ok('says what tomorrow drops to',
-     /tomorrow drops to R\d/.test($('safeSub').textContent), $('safeSub').textContent);
+     /tomorrow drops to £\d/.test($('safeSub').textContent), $('safeSub').textContent);
 
   console.log('\n=== 24. bills still come out of the same pot ===');
   const oneP = JSON.parse(JSON.stringify(roll));
@@ -664,7 +601,7 @@ const seed = {
   dom = await boot(shade); w = dom.window; d = w.document; $ = id => d.getElementById(id);
   const todayBar = [...d.querySelectorAll('#bars .bar')].filter(b => b.style.height !== '3%').pop();
   ok('the bill part is hatched', !!todayBar.querySelector('i.fix'), todayBar.outerHTML.slice(0, 90));
-  ok('and it says how much was a bill', /R900 of this was a bill/.test(todayBar.querySelector('i.fix').title),
+  ok('and it says how much was a bill', /£900 of this was a bill/.test(todayBar.querySelector('i.fix').title),
      todayBar.querySelector('i.fix').title);
   ok('a big bill day is not marked as overspending', !todayBar.className.includes('hot'),
      todayBar.className);
@@ -903,7 +840,7 @@ const seed = {
   console.log('\n=== 37. navigation moved to a bottom bar ===');
   dom = await boot(twoMonths); w = dom.window; d = w.document; $ = id => d.getElementById(id);
   ok('there is a bottom bar', !!$('tabbar'));
-  ok('with five destinations', $('tabbar').querySelectorAll('button').length === 5,
+  ok('with four destinations', $('tabbar').querySelectorAll('button').length === 4,
      String($('tabbar').querySelectorAll('button').length));
   ok('the header is just the name', d.querySelector('.top').textContent.trim() === 'Tracker',
      d.querySelector('.top').textContent.trim());
@@ -1096,8 +1033,8 @@ const seed = {
   ok('with a PDF header', bytes.slice(0, 5).toString() === '%PDF-', bytes.slice(0, 8).toString());
   ok('a cross-reference table', bytes.includes('xref'));
   ok('and a proper ending', bytes.slice(-6).toString().includes('%%EOF'));
-  ok('the entry list keeps cents, like the CSV does — for reconciling against a bank statement',
-     bytes.toString('latin1').includes('133,48'));   // en-ZA locale formatting, same as "R9 347" elsewhere in the statement
+  ok('the entry list keeps pence, like the CSV does — for reconciling against a bank statement',
+     bytes.toString('latin1').includes('133.48'));
   ok('it paginates long months', (bytes.toString('latin1').match(/\/Type\/Page[^s]/g) || []).length >= 1,
      String((bytes.toString('latin1').match(/\/Type\/Page[^s]/g) || []).length));
 
@@ -1209,7 +1146,7 @@ const seed = {
   console.log('\n=== 47. savings show the month and the total ===');
   dom = await boot(twoMonths); w = dom.window; d = w.document; $ = id => d.getElementById(id);
   $('tabMonth').click();
-  [...d.querySelectorAll('#sweepBox button')].find(b => /Save R/.test(b.textContent)).click();
+  [...d.querySelectorAll('#sweepBox button')].find(b => /Save £/.test(b.textContent)).click();
   $('vaultSave').click();
   await new Promise(r => setTimeout(r, 60));
   ok('the total counts it', num($('vaultAll').textContent) === 6000, $('vaultAll').textContent);
@@ -1221,41 +1158,6 @@ const seed = {
   ok('a withdrawal lowers the total', num($('vaultAll').textContent) === 5000,
      $('vaultAll').textContent);
 
-  console.log('\n=== 48. investments ===');
-  const inv = JSON.parse(JSON.stringify(yearly));
-  inv.holdings = [
-    { id: 'h1', n: 'Satrix MSCI World', kind: 'etf', sym: '', in: 5000, units: 0, price: 0, val: 6200 },
-    { id: 'h2', n: 'Bitcoin', kind: 'crypto', sym: 'bitcoin', in: 2000, units: 0.001, price: 1800000, val: 0 },
-    { id: 'h3', n: 'Emergency fund', kind: 'cash', sym: '', in: 3000, units: 0, price: 0, val: 3050 }
-  ];
-  dom = await boot(inv); w = dom.window; d = w.document; $ = id => d.getElementById(id);
-  ok('lives behind its own tab, not the daily dashboard', !!$('openInvest'));
-  $('openInvest').click();
-  ok('opens its own sheet', $('investDlg').open === true);
-  // 6200 + (0.001 x 1 800 000 = 1800) + 3050 = 11 050 against 10 000 in
-  ok('it totals what things are worth', num($('invValue').textContent) === 11050,
-     $('invValue').textContent);
-  ok('and shows the gain', /10 000 put in/.test($('invSub').textContent.replace(/\s/g, ' ')),
-     $('invSub').textContent);
-  ok('marked as up', $('invValue').className.includes('up'), $('invValue').className);
-  ok('one row per holding', d.querySelectorAll('#invList .irow').length === 3,
-     String(d.querySelectorAll('#invList .irow').length));
-  ok('units and price shown where given',
-     /0.001 at R1 800 000/.test(d.querySelector('#invList').textContent.replace(/\s/g, ' ')),
-     d.querySelector('#invList').textContent.slice(0, 120));
-
-  // none of it touches the spending maths
-  const allowanceBefore = num($('safe').textContent);
-  d.querySelector('#invList .irow').click();
-  $('holdVal').value = '99999';
-  $('holdSave').click();
-  await new Promise(r => setTimeout(r, 60));
-  ok('changing a holding leaves the allowance alone',
-     num($('safe').textContent) === allowanceBefore,
-     allowanceBefore + ' → ' + num($('safe').textContent));
-  ok('but the investment total moves', num($('invValue').textContent) > 11050,
-     $('invValue').textContent);
-
   console.log('\n=== 49. a yearly bill can be spread ===');
   const spread = JSON.parse(JSON.stringify(yearly));
   spread.bills[1].spread = true;          // Tenorshare R900 in May
@@ -1265,30 +1167,13 @@ const seed = {
   ok('a twelfth is held back out of season', num($('due').textContent) === 304,
      $('due').textContent);
   $('dueStat').click();
-  ok('and it says so', /holding R75 back/.test($('subsFoot').textContent.replace(/\s/g, ' ')),
+  ok('and it says so', /holding £75 back/.test($('subsFoot').textContent.replace(/\s/g, ' ')),
      $('subsFoot').textContent);
-
-  console.log('\n=== 50. investments keep a history ===');
-  const hist = JSON.parse(JSON.stringify(yearly));
-  hist.holdings = [{ id: 'h1', n: 'Satrix', kind: 'etf', in: 5000, units: 0, price: 0, val: 6000 }];
-  hist.invHist = [
-    { d: '2026-07-01', w: 5200, i: 5000 },
-    { d: '2026-07-25', w: 5600, i: 5000 }
-  ];
-  dom = await boot(hist); w = dom.window; d = w.document; $ = id => d.getElementById(id);
-  $('openInvest').click();
-  ok('it reports the trend against a month ago',
-     /Up R400 \(7.1%\) over 37 days/.test($('invFoot').textContent),
-     $('invFoot').textContent);
-  const snaps = JSON.parse(w.localStorage.getItem('slip:v4')).invHist;
-  ok('and records today', snaps[snaps.length - 1].d === TODAY, snaps[snaps.length - 1].d);
-  ok('without duplicating it', snaps.filter(x => x.d === TODAY).length === 1,
-     String(snaps.filter(x => x.d === TODAY).length));
 
   console.log('\n=== 51. reading a receipt keeps only the numbers ===');
   dom = await boot(seed); w = dom.window; d = w.document; $ = id => d.getElementById(id);
-  const slip = ['CHECKERS HYPER', 'MILK 2L 24.99', 'BREAD 18.50',
-                'SUBTOTAL 133.48', 'VAT 15% 17.41', 'TOTAL 133.48', '2026-08-30 14:22'].join('\n');
+  const slip = ['TESCO EXTRA', 'MILK 2L 1.55', 'BREAD 1.20',
+                'SUBTOTAL 133.48', 'VAT 20% 22.25', 'TOTAL 133.48', '2026-08-30 14:22'].join('\n');
   $('scanBtn').click();
   ok('the sheet opens', $('scanDlg').open === true);
   $('scanText').value = slip;
@@ -1297,7 +1182,7 @@ const seed = {
      Number($('scanAmt').value) === 133.48, $('scanAmt').value);
   ok('and the date', $('scanDate').value === '2026-08-30', $('scanDate').value);
   ok('and guesses the category', $('scanCat').value === 'Groceries', $('scanCat').value);
-  ok('and where it was', /CHECKERS/.test($('scanWho').value), $('scanWho').value);
+  ok('and where it was', /TESCO/.test($('scanWho').value), $('scanWho').value);
   ok('and explains where the number came from', /TOTAL/.test($('scanFound').textContent),
      $('scanFound').textContent);
 
@@ -1407,25 +1292,6 @@ const seed = {
   ok('logging it clears the nudge on the next render',
      $('incBanner').style.display === 'none', $('incBanner').style.display);
 
-  console.log('\n=== 56. a failed price fetch names what it could not reach ===');
-  const priceSeed = JSON.parse(JSON.stringify(seed));
-  priceSeed.holdings = [
-    { id: 'h1', n: 'Bitcoin', kind: 'crypto', sym: 'bitcoin', in: 2000, units: 0.001, price: 1800000, val: 0 },
-    { id: 'h2', n: 'Satrix MSCI World', kind: 'etf', sym: 'stx.jse', in: 5000, units: 10, price: 620, val: 0 }
-  ];
-  dom = await boot(priceSeed); w = dom.window; d = w.document; $ = id => d.getElementById(id);
-  $('openInvest').click();
-  $('invRefresh').click();
-  await new Promise(r => setTimeout(r, 100));
-  ok('names the symbol it could not fetch, not just "could not fetch"',
-     /bitcoin/i.test($('invRefresh').textContent) || /stx/i.test($('invRefresh').textContent),
-     $('invRefresh').textContent);
-  ok('offline in test rejects every price call, so both are named',
-     /bitcoin/i.test($('invRefresh').textContent) && /stx/i.test($('invRefresh').textContent),
-     $('invRefresh').textContent);
-  ok('the stale price is left untouched, not zeroed', num($('invValue').textContent) > 0,
-     $('invValue').textContent);
-
   console.log('\n=== 57. sheet drag-to-dismiss reads velocity, not just distance ===');
   dom = await boot(seed); w = dom.window; d = w.document; $ = id => d.getElementById(id);
   const touch = (type, y, target) => target.dispatchEvent(new w.TouchEvent(type,
@@ -1499,331 +1365,6 @@ const seed = {
      r$('findDlg').style.transition === 'none' && r$('findDlg').open === false,
      r$('findDlg').style.transition + ' / open=' + r$('findDlg').open);
 
-  console.log('\n=== 59. prices refresh once a day on their own, not on a schedule that needs the app open ===');
-  const staleSeed = JSON.parse(JSON.stringify(seed));
-  staleSeed.holdings = [{ id: 'h1', n: 'AMD', kind: 'stock', sym: 'AMD.US', in: 2427.20, units: 0, price: 0, val: 2652.71 }];
-  staleSeed.avKey = 'demo';
-  // no invAt at all — never refreshed before
-  dom = await boot(staleSeed); w = dom.window; d = w.document; $ = id => d.getElementById(id);
-  await wait(1500);
-  ok('it tries on its own at boot, with nobody tapping the button',
-     /Could not fetch/.test($('invRefresh').textContent), $('invRefresh').textContent);
-
-  const noKeySeed = JSON.parse(JSON.stringify(staleSeed));
-  delete noKeySeed.avKey;
-  dom = await boot(noKeySeed); w = dom.window; d = w.document; $ = id => d.getElementById(id);
-  await wait(500);
-  ok('and asks for a key by name when there is none',
-     /Add an Alpha Vantage key/.test($('invRefresh').textContent), $('invRefresh').textContent);
-
-  const freshSeed = JSON.parse(JSON.stringify(staleSeed));
-  freshSeed.invAt = TODAY;   // already refreshed today
-  dom = await boot(freshSeed); w = dom.window; d = w.document; $ = id => d.getElementById(id);
-  await wait(150);
-  ok('but not again the same day', $('invRefresh').textContent === 'Update prices',
-     $('invRefresh').textContent);
-
-  console.log('\n=== 60. a holding shows in whatever currency it actually is ===');
-  const usdSeed = JSON.parse(JSON.stringify(seed));
-  usdSeed.holdings = [
-    { id: 'h1', n: 'AMD', kind: 'stock', cur: 'USD', sym: 'AMD.US', in: 152.08, units: 0, price: 0, val: 166.21 },
-    { id: 'h2', n: 'Vanguard S&P 500', kind: 'etf', cur: 'USD', sym: 'VOO.US', in: 700, units: 0, price: 0, val: 791.79 }
-  ];
-  dom = await boot(usdSeed); w = dom.window; d = w.document; $ = id => d.getElementById(id);
-  $('openInvest').click();
-  ok('the total shows in dollars, not rand, when every holding is USD',
-     $('invValue').textContent.startsWith('$'), $('invValue').textContent);
-  ok('right total: 166.21 + 791.79 = 958.00',
-     Math.abs(num($('invValue').textContent) - 958) < 0.5, $('invValue').textContent);
-  ok('put-in figure is in dollars too', $('invSub').textContent.includes('$852'), $('invSub').textContent);
-  ok('each row shows its own holding in dollars',
-     [...d.querySelectorAll('#invList .iv b')].every(el => el.textContent.startsWith('$')),
-     [...d.querySelectorAll('#invList .iv b')].map(el => el.textContent).join(', '));
-
-  const mixedSeed = JSON.parse(JSON.stringify(seed));
-  mixedSeed.holdings = [
-    { id: 'h1', n: 'AMD', kind: 'stock', cur: 'USD', sym: 'AMD.US', in: 152.08, units: 0, price: 0, val: 166.21 },
-    { id: 'h2', n: 'Satrix', kind: 'etf', cur: 'ZAR', sym: '', in: 5000, units: 0, price: 0, val: 6200 }
-  ];
-  dom = await boot(mixedSeed); w = dom.window; d = w.document; $ = id => d.getElementById(id);
-  $('openInvest').click();
-  ok('a mixed-currency portfolio falls back to rand for the total, rather than adding unlike numbers',
-     $('invValue').textContent.startsWith('R'), $('invValue').textContent);
-  ok('but each row still shows its own currency correctly',
-     d.querySelector('#invList .iv b').textContent.startsWith('$') ||
-     [...d.querySelectorAll('#invList .iv b')].some(el => el.textContent.startsWith('$')),
-     [...d.querySelectorAll('#invList .iv b')].map(el => el.textContent).join(', '));
-
-  console.log('\n=== 61. the holding dialog labels follow the chosen currency ===');
-  dom = await boot(seed); w = dom.window; d = w.document; $ = id => d.getElementById(id);
-  $('openInvest').click(); $('invAdd').click();
-  ok('starts in rand by default', $('holdInLabel').textContent.includes('(R)'), $('holdInLabel').textContent);
-  $('holdCur').value = 'USD';
-  $('holdCur').dispatchEvent(new w.Event('change'));
-  ok('switches to dollars', $('holdInLabel').textContent.includes('($)'), $('holdInLabel').textContent);
-  ok('worth-now label follows too', $('holdValLabel').textContent.includes('($)'), $('holdValLabel').textContent);
-  $('holdName').value = 'Test holding';
-  $('holdIn').value = '100';
-  $('holdVal').value = '110';
-  $('holdSave').click();
-  const savedHold = JSON.parse(w.localStorage.getItem('slip:v4')).holdings[0];
-  ok('the currency is saved on the holding', savedHold.cur === 'USD', savedHold.cur);
-
-  console.log('\n=== 62. a fetched price respects the holding\'s own currency ===');
-  const cryptoSeed = JSON.parse(JSON.stringify(seed));
-  cryptoSeed.invAt = TODAY;   // suppress the automatic boot-time refresh; this test drives it by hand
-  cryptoSeed.holdings = [
-    { id: 'h1', n: 'Bitcoin', kind: 'crypto', cur: 'USD', sym: 'bitcoin', in: 100, units: 0, price: 0, val: 100 }
-  ];
-  const cgDom = new (require('jsdom').JSDOM)(HTML, {
-    runScripts: 'dangerously', url: 'https://x.github.io/a/', pretendToBeVisual: true,
-    beforeParse(win) {
-      const Real = win.Date;
-      class FD extends Real { constructor(...a) { if (!a.length) super(TODAY + 'T09:00:00Z'); else super(...a); }
-        static now() { return new Real(TODAY + 'T09:00:00Z').getTime(); } }
-      win.Date = FD;
-      win.matchMedia = () => ({ matches: false, addEventListener() {}, addListener() {} });
-      win.fetch = url => {
-        if (String(url).includes('coingecko')) {
-          // a coin priced very differently in each currency, so picking the wrong one is obvious
-          return Promise.resolve({ json: () => Promise.resolve({ bitcoin: { usd: 65000, zar: 999999 } }) });
-        }
-        return Promise.reject(0);
-      };
-      win.confirm = () => true; win.alert = () => {}; win.scrollTo = () => {};
-      win.localStorage.setItem('slip:v4', JSON.stringify(cryptoSeed));
-      win.HTMLDialogElement.prototype.showModal = function () { this.open = true; };
-      win.HTMLDialogElement.prototype.close = function () { this.open = false;
-        this.dispatchEvent(new win.Event('close')); };
-    }
-  });
-  await wait(200);
-  const cgD = cgDom.window.document, cg$ = id => cgD.getElementById(id);
-  cg$('openInvest').click();
-  cg$('invRefresh').click();
-  await wait(150);
-  const cgHold = JSON.parse(cgDom.window.localStorage.getItem('slip:v4')).holdings[0];
-  ok('fetched the price in the holding\'s own currency (USD), not always ZAR',
-     cgHold.price === 65000, String(cgHold.price));
-
-  console.log('\n=== 63. a resolved price refresh corrects the day\'s snapshot, not just the display ===');
-  const snapSeed = JSON.parse(JSON.stringify(seed));
-  snapSeed.holdings = [
-    { id: 'h1', n: 'Test Co', kind: 'stock', cur: 'USD', sym: 'TEST', in: 100, units: 1, price: 50, val: 0 }
-  ];
-  snapSeed.avKey = 'realkey';
-  // no invAt at all, so boot's own auto-refresh fires without being awaited —
-  // exactly the race this test is checking
-  const snapDom = new (require('jsdom').JSDOM)(HTML, {
-    runScripts: 'dangerously', url: 'https://x.github.io/a/', pretendToBeVisual: true,
-    beforeParse(win) {
-      const Real = win.Date;
-      class FD extends Real { constructor(...a) { if (!a.length) super(TODAY + 'T09:00:00Z'); else super(...a); }
-        static now() { return new Real(TODAY + 'T09:00:00Z').getTime(); } }
-      win.Date = FD;
-      win.matchMedia = () => ({ matches: false, addEventListener() {}, addListener() {} });
-      win.fetch = url => String(url).includes('alphavantage')
-        ? Promise.resolve({ json: () => Promise.resolve({ 'Global Quote': { '05. price': '200' } }) })
-        : Promise.reject(0);
-      win.confirm = () => true; win.alert = () => {}; win.scrollTo = () => {};
-      win.localStorage.setItem('slip:v4', JSON.stringify(snapSeed));
-      win.HTMLDialogElement.prototype.showModal = function () { this.open = true; };
-      win.HTMLDialogElement.prototype.close = function () { this.open = false;
-        this.dispatchEvent(new win.Event('close')); };
-    }
-  });
-  await wait(1800);   // past the 1100ms alphavantage spacing, so the auto-refresh has resolved
-  const snaps63 = JSON.parse(snapDom.window.localStorage.getItem('slip:v4')).invHist;
-  const today63 = snaps63[snaps63.length - 1];
-  ok('the day\'s snapshot reflects the price the fetch actually resolved to (1 unit @ 200), not the stale 50',
-     today63.w === 200, JSON.stringify(today63));
-
-  console.log('\n=== 64. EUR is a full fifth currency ===');
-  dom = await boot(seed); w = dom.window; d = w.document; $ = id => d.getElementById(id);
-  for (const sel of ['cur', 'billCur', 'incCur', 'holdCur']) {
-    ok(sel + ' offers EUR', !![...$(sel).options].find(o => o.value === 'EUR'), sel);
-  }
-  $('openSet').click();
-  ok('settings has a euro rate input', !!$('rEUR'));
-  $('rEUR').value = '19.5'; $('rEUR').dispatchEvent(new w.Event('change'));
-  ok('editing it updates data.rates.EUR', JSON.parse(w.localStorage.getItem('slip:v4')).rates.EUR === 19.5,
-     JSON.parse(w.localStorage.getItem('slip:v4')).rates.EUR);
-
-  const eur = JSON.parse(JSON.stringify(seed));
-  eur.rates = { ZAR: 1, GBP: 21.78, USD: 16.23, GHS: 1.4464, EUR: 18.75 };
-  eur.bills = [
-    { id: 'e1', n: 'Netflix', a: 12, cur: 'EUR', zar: 0, cat: 'Subscriptions', note: '' }
-  ];
-  dom = await boot(eur); w = dom.window; d = w.document; $ = id => d.getElementById(id);
-  $('tabMonth').click();
-  ok('a euro bill converts at the stored EUR rate', Math.abs(num($('due').textContent) - 225) < 2,
-     $('due').textContent);
-
-  console.log('\n=== 65. a month can run in its own currency, without touching past months ===');
-  const twoCyc = {
-    day: 25, starts: { '2026-08': '2026-08-28' }, goal: 3500, theme: 'light',
-    rates: { ZAR: 1, GBP: 21.78, USD: 15.96, GHS: 1.44, EUR: 18.75 },
-    cycCur: { '2026-08-28': 'GBP' }, cycRate: { '2026-08-28': 21.78 },
-    cats: [], groups: [], bills: [], ticks: {},
-    entries: [
-      { id: 1, amt: 10000, cat: 'Money in', note: '', date: '2026-07-28', type: 'in', cyc: '2026-07-28', man: true },
-      { id: 2, amt: 2000, cat: 'Rent', note: '', date: '2026-07-29', type: 'out', cyc: '2026-07-28' },
-      { id: 3, amt: 21780, cat: 'Money in', note: '', date: '2026-08-28', type: 'in', cyc: '2026-08-28', man: true },
-      { id: 4, amt: 2178, cat: 'Rent', note: '', date: '2026-08-29', type: 'out', cyc: '2026-08-28' }
-    ]
-  };
-  dom = await boot(twoCyc); w = dom.window; d = w.document; $ = id => d.getElementById(id);
-  $('tabMonth').click();
-  ok('the live dashboard reads in pounds, since the open cycle is GBP',
-     $('secVal').textContent.includes('£'), $('secVal').textContent);
-  ok('and the figure is converted, not the raw rand number relabelled',
-     Math.abs(num($('inVal').textContent) - 1000) < 1, $('inVal').textContent);
-
-  $('openHist').click();
-  const histRows = [...d.querySelectorAll('#histList .hist')];
-  ok('the closed July cycle is listed', histRows.length === 1, histRows.length);
-  ok('and still reads in rand, not pounds', histRows[0].textContent.includes('R') && !histRows[0].textContent.includes('£'),
-     histRows[0].textContent);
-  histRows[0].querySelector('div').click();
-  ok('opening it shows rand figures', $('monthStats').textContent.includes('R'), $('monthStats').textContent);
-  ok('not pounds', !$('monthStats').textContent.includes('£'), $('monthStats').textContent);
-  $('closeMonth').click();
-
-  $('openSet').click();
-  ok("settings shows this month's currency as GBP", $('sCycCur').value === 'GBP', $('sCycCur').value);
-  $('sCycCur').value = 'EUR'; $('sCycCur').dispatchEvent(new w.Event('change'));
-  $('closeSet').click();
-  const afterSet = JSON.parse(w.localStorage.getItem('slip:v4'));
-  ok('changing it in Settings only touches the open cycle', afterSet.cycCur['2026-08-28'] === 'EUR',
-     JSON.stringify(afterSet.cycCur));
-  ok('the past cycle is untouched', afterSet.cycCur['2026-07-28'] === 'ZAR', JSON.stringify(afterSet.cycCur));
-
-  dom = await boot(seed); w = dom.window; d = w.document; $ = id => d.getElementById(id);
-  $('kIn').click();
-  $('startToday').checked = true; $('startToday').dispatchEvent(new w.Event('change'));
-  ok('picking a new month shows its currency selector', $('cycCurRow').style.display === 'flex');
-  $('cycCurSel').value = 'GBP';
-  $('amt').value = '5000';
-  $('addBtn').click();
-  const afterIncome = JSON.parse(w.localStorage.getItem('slip:v4'));
-  ok("logging income while starting a new month writes that month's currency",
-     afterIncome.cycCur['2026-08-31'] === 'GBP', JSON.stringify(afterIncome.cycCur));
-  ok('and freezes the rate active at that moment', afterIncome.cycRate['2026-08-31'] === afterIncome.rates.GBP,
-     afterIncome.cycRate['2026-08-31']);
-  $('openSet').click();
-  ok("settings reflects it immediately, without needing a reopen to refresh",
-     $('sCycCur').value === 'GBP', $('sCycCur').value);
-
-  console.log('\n=== 66. old saved data without EUR/cycCur still loads cleanly ===');
-  const oldSeed = JSON.parse(JSON.stringify(seed));   // seed.rates has no EUR key at all
-  dom = await boot(oldSeed); w = dom.window; d = w.document; $ = id => d.getElementById(id);
-  $('openSet').click();
-  ok('the EUR rate field is never blank', $('rEUR').value !== '' && $('rEUR').value !== '0',
-     $('rEUR').value);
-  ok('this month\'s currency defaults to rand rather than throwing', $('sCycCur').value === 'ZAR',
-     $('sCycCur').value);
-
-  console.log('\n=== 67. savings pots keep their own currency, independent of the month ===');
-  const potSeed2 = JSON.parse(JSON.stringify(seed));
-  potSeed2.rates = { ZAR: 1, GBP: 21.78, USD: 15.96, GHS: 1.44, EUR: 18.75 };
-  dom = await boot(potSeed2); w = dom.window; d = w.document; $ = id => d.getElementById(id);
-
-  $('vaultOpen').click(); $('vaultAddMore').click();
-  ok('the currency selector shows when putting money away', $('vaultPotRow').style.display === 'block');
-  $('vaultCur').value = 'GBP'; $('vaultCur').dispatchEvent(new w.Event('change'));
-  $('vaultAmt').value = '100';
-  $('vaultSave').click();
-  let after67 = JSON.parse(w.localStorage.getItem('slip:v4'));
-  let savedGBP = after67.entries.find(e => e.type === 'save' && e.cur === 'GBP');
-  ok('the pot amount is kept native, not pre-converted', savedGBP && savedGBP.orig === 100, JSON.stringify(savedGBP));
-  ok('the ledger side is converted at the live rate', Math.abs(savedGBP.amt - 100 * 21.78) < 0.01, savedGBP.amt);
-
-  $('vaultOpen').click(); $('vaultAddMore').click();
-  $('vaultCur').value = 'ZAR'; $('vaultCur').dispatchEvent(new w.Event('change'));
-  $('vaultAmt').value = '500';
-  $('vaultSave').click();
-  ok('the running total shows one line per pot in use',
-     $('vaultAll').textContent.includes('£') && $('vaultAll').textContent.includes('R'),
-     $('vaultAll').textContent);
-
-  $('withdrawBtn').click();
-  ok('withdrawing offers a pot picker once more than one pot is active',
-     $('vaultPotRow').style.display === 'block');
-  ok('and asks whether it was already converted', $('vaultConvRow').style.display === 'block');
-  $('vaultCur').value = 'GBP'; $('vaultCur').dispatchEvent(new w.Event('change'));
-  $('vaultAmt').value = '40';
-  $('vaultSave').click();
-  after67 = JSON.parse(w.localStorage.getItem('slip:v4'));
-  let plainWithdraw = after67.entries.find(e => e.type === 'unsave' && e.cur === 'GBP');
-  ok('not converted: the pot amount stays native and the rand side uses the live rate',
-     plainWithdraw.orig === 40 && Math.abs(plainWithdraw.amt - 40 * 21.78) < 0.01,
-     JSON.stringify(plainWithdraw));
-
-  $('withdrawBtn').click();
-  $('vaultCur').value = 'GBP'; $('vaultCur').dispatchEvent(new w.Event('change'));
-  $('vaultAmt').value = '30';
-  $('vaultConverted').checked = true; $('vaultConverted').dispatchEvent(new w.Event('change'));
-  ok('checking it reveals the received-amount field', $('vaultRecvRow').style.display === 'block');
-  $('vaultRecv').value = '640';
-  $('vaultSave').click();
-  after67 = JSON.parse(w.localStorage.getItem('slip:v4'));
-  const convertedWithdraws = after67.entries.filter(e => e.type === 'unsave' && e.cur === 'GBP');
-  const manual = convertedWithdraws[convertedWithdraws.length - 1];
-  ok('converted yourself: the rand side is exactly what you typed, not recomputed',
-     manual.orig === 30 && manual.amt === 640, JSON.stringify(manual));
-
-  $('withdrawBtn').click();
-  $('vaultCur').value = 'GBP'; $('vaultCur').dispatchEvent(new w.Event('change'));
-  const beforeOverdraw = after67.entries.length;
-  $('vaultAmt').value = '999999';
-  $('vaultSave').click();
-  after67 = JSON.parse(w.localStorage.getItem('slip:v4'));
-  ok('cannot overdraw a single pot beyond its own balance', after67.entries.length === beforeOverdraw,
-     after67.entries.length + ' vs ' + beforeOverdraw);
-
-  console.log('\n=== 68. audit fixes: onboarding hint, shortfall pot, settings ordering ===');
-  const cleanSeed = JSON.parse(JSON.stringify(seed));
-  dom = await boot(cleanSeed); w = dom.window; d = w.document; $ = id => d.getElementById(id);
-  ok('first-ever use still offers the real onboarding hint, not the generic one',
-     $('sweepBox').textContent.includes('Whatever is left when a month ends'),
-     $('sweepBox').textContent);
-
-  const shortfallSeed = {
-    day: 25, starts: { '2026-08': '2026-08-28' }, goal: 0, theme: 'light',
-    rates: { ZAR: 1, GBP: 21.78, USD: 15.96, GHS: 1.44, EUR: 18.75 },
-    cats: [], groups: [], bills: [], ticks: {},
-    entries: [
-      { id: 1, amt: 1000, cat: 'Money in', note: '', date: '2026-07-28', type: 'in', cyc: '2026-07-28', man: true },
-      { id: 2, amt: 1500, cat: 'Rent', note: '', date: '2026-07-29', type: 'out', cyc: '2026-07-28' },
-      { id: 3, amt: 1089, cat: 'Savings', note: '', date: '2026-08-28', type: 'save', cyc: '2026-08-28', cur: 'GBP', orig: 50, rate: 21.78 },
-      { id: 5, amt: 600, cat: 'Savings', note: '', date: '2026-08-28', type: 'save', cyc: '2026-08-28' },
-      { id: 4, amt: 20000, cat: 'Money in', note: '', date: '2026-08-28', type: 'in', cyc: '2026-08-28', man: true }
-    ]
-  };
-  dom = await boot(shortfallSeed); w = dom.window; d = w.document; $ = id => d.getElementById(id);
-  const takeBackBtn = [...d.querySelectorAll('#sweepBox button')].find(b => /Take R.*back/.test(b.textContent));
-  ok('the shortfall-recovery button shows up when a backdated entry pushes a past month negative',
-     !!takeBackBtn, [...d.querySelectorAll('#sweepBox button')].map(b => b.textContent).join(' / '));
-  takeBackBtn.click();
-  ok("it deals in rand without offering a pot picker, even with a GBP pot also active — it's reversing calc()'s own rand figure",
-     $('vaultCur').value === 'ZAR' && $('vaultPotRow').style.display === 'none',
-     $('vaultCur').value + ' / ' + $('vaultPotRow').style.display);
-  $('vaultSave').click();
-  const shortfallEntry = JSON.parse(w.localStorage.getItem('slip:v4')).entries
-    .find(e => e.type === 'unsave' && e.cyc === '2026-07-28');
-  ok('the reversal entry itself carries no foreign-currency tag', shortfallEntry && !shortfallEntry.cur,
-     JSON.stringify(shortfallEntry));
-
-  const bothSeed = JSON.parse(JSON.stringify(seed));
-  dom = await boot(bothSeed); w = dom.window; d = w.document; $ = id => d.getElementById(id);
-  $('openSet').click();
-  $('sStart').value = '2026-08-20';
-  $('sCycCur').value = 'GBP';
-  $('closeSet').click();
-  const afterBoth = JSON.parse(w.localStorage.getItem('slip:v4'));
-  ok('changing the start day and the currency together lands the currency on the new cycle',
-     afterBoth.cycCur['2026-08-20'] === 'GBP', JSON.stringify(afterBoth.cycCur));
-
   console.log('\n=== 69. Rent & the like is a monthly figure, not a weekly one ===');
   dom = await boot(seed); w = dom.window; d = w.document; $ = id => d.getElementById(id);
   $('tabWeek').click();
@@ -1832,35 +1373,6 @@ const seed = {
   $('tabMonth').click();
   ok('back in the month view, where it actually applies', $('billCell').style.display === 'block',
      $('billCell').style.display);
-
-  console.log('\n=== 70. a default currency, without reinterpreting months that already happened ===');
-  const homeCurSeed = JSON.parse(JSON.stringify(seed));
-  dom = await boot(homeCurSeed); w = dom.window; d = w.document; $ = id => d.getElementById(id);
-  $('openSet').click();
-  ok('defaults to rand when nothing has been set', $('sHomeCur').value === 'ZAR', $('sHomeCur').value);
-  $('sHomeCur').value = 'GBP'; $('sHomeCur').dispatchEvent(new w.Event('change'));
-  $('closeSet').click();
-  const afterHome = JSON.parse(w.localStorage.getItem('slip:v4'));
-  ok('setting it is remembered', afterHome.homeCur === 'GBP', afterHome.homeCur);
-  ok("the already-open month is already pinned, so the new default alone doesn't reach it",
-     afterHome.cycCur['2026-08-28'] === 'ZAR', JSON.stringify(afterHome.cycCur));
-  $('tabMonth').click();
-  ok('the current month still reads in rand — you have to say so explicitly to change a month in progress',
-     $('secVal').textContent.includes('R') && !$('secVal').textContent.includes('£'),
-     $('secVal').textContent);
-
-  const emptyCycSeed = JSON.parse(JSON.stringify(seed));
-  emptyCycSeed.entries = [];
-  dom = await boot(emptyCycSeed); w = dom.window; d = w.document; $ = id => d.getElementById(id);
-  $('openSet').click();
-  $('sHomeCur').value = 'EUR'; $('sHomeCur').dispatchEvent(new w.Event('change'));
-  $('closeSet').click();
-  const afterEmpty = JSON.parse(w.localStorage.getItem('slip:v4'));
-  ok("a month with nothing logged yet just follows the new default, no override needed",
-     afterEmpty.homeCur === 'EUR' && !afterEmpty.cycCur['2026-08-28'],
-     JSON.stringify(afterEmpty.cycCur));
-  $('tabMonth').click();
-  ok('and actually reads in euros', $('secVal').textContent.includes('€'), $('secVal').textContent);
 
   console.log('\n=== result ===');
   console.log(pass + ' passed, ' + fail + ' failed');

@@ -160,6 +160,8 @@ backend.
   frozen clock. Run it before and after every change.
 - To deploy: edit `index.html`, **bump the `slip-build` meta tag** on line 7, then push. GitHub
   Pages redeploys in about a minute and the running app offers the update.
+- `CLAUDE.md` records how this fork differs from the personal repo, what to watch for when
+  porting a change across, and an append-only log of every change made here.
 - `TRACKER-PROJECT.md` has the money model, the cycle rules, and a list of bugs that must not be
   reintroduced.
 - Changes here are ported from the personal repo (`fayzalad/Spending-Tracker`). The two have

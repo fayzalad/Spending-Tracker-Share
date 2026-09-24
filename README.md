@@ -136,6 +136,18 @@ dashboard updates straight away and the previous month closes the day before.
 This is handy if your pay date moves around rather than landing on the same day each month: just
 log it whenever it arrives and let the app set the month from that.
 
+### 24 September 2026 (later the same day)
+
+**It now fixes itself when you open the app.**
+
+The change above only applied to money logged from then on — anything already recorded the old
+way still needed correcting by hand. It no longer does. When the app opens, it checks for pay
+that was recorded against a later month than the date it arrived on, and starts that month on
+the right day for you. Nothing to tap.
+
+If you deliberately told it *not* to start a new month (by unticking the box), that choice is
+remembered and left alone. Closed months are never rearranged.
+
 ---
 
 ## For whoever maintains this
@@ -144,7 +156,7 @@ This is a fork of a personal tracker, customised for one person (GBP throughout,
 tab, a trimmed category list). It's a single `index.html` — no framework, no build step, no
 backend.
 
-- `node test.js` runs the suite (**351 checks**) — it boots the real `index.html` in jsdom with a
+- `node test.js` runs the suite (**355 checks**) — it boots the real `index.html` in jsdom with a
   frozen clock. Run it before and after every change.
 - To deploy: edit `index.html`, **bump the `slip-build` meta tag** on line 7, then push. GitHub
   Pages redeploys in about a minute and the running app offers the update.

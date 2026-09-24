@@ -110,3 +110,45 @@ from backup** loads one back in.
 This is safe to share — everyone's data stays private to their own phone (and their own GitHub
 backup, if they set one up). Nothing is shared between people using the same link; there's no
 shared account or server in the middle.
+
+## What's new
+
+### 24 September 2026
+
+**Telling it a new month has started now works properly when you're paid early or late.**
+
+When you log your pay, the **Counts toward** dropdown lets you say which month the money belongs
+to. Previously, choosing "the next one" filed the money forward but left the month itself running
+until your usual allowance day — so if you were paid a couple of days early, the money vanished
+from the dashboard until that day came round, and the app kept spreading your old month's
+leftovers over days you'd already been paid for.
+
+Now, choosing the next month **starts that month on the day the money actually arrived**. The
+dashboard updates straight away and the previous month closes the day before.
+
+- The checkbox under the dropdown now names the month it's about to start and the day it'll start
+  it — for example *"Start October from 23 Sept instead of the 25th"* — and keeps up if you change
+  the date. It used to show whatever date was there when you first tapped **Received**.
+- If you'd rather the money waited for your usual allowance day, just untick that box.
+- Already logged your pay the old way and it isn't showing? Tap the entry, then **Save changes** —
+  that's enough to move the month onto the right day.
+
+This is handy if your pay date moves around rather than landing on the same day each month: just
+log it whenever it arrives and let the app set the month from that.
+
+---
+
+## For whoever maintains this
+
+This is a fork of a personal tracker, customised for one person (GBP throughout, no Investments
+tab, a trimmed category list). It's a single `index.html` — no framework, no build step, no
+backend.
+
+- `node test.js` runs the suite (**351 checks**) — it boots the real `index.html` in jsdom with a
+  frozen clock. Run it before and after every change.
+- To deploy: edit `index.html`, **bump the `slip-build` meta tag** on line 7, then push. GitHub
+  Pages redeploys in about a minute and the running app offers the update.
+- `TRACKER-PROJECT.md` has the money model, the cycle rules, and a list of bugs that must not be
+  reintroduced.
+- Changes here are ported from the personal repo (`fayzalad/Spending-Tracker`). The two have
+  independent history — a commit in one never touches the other.
